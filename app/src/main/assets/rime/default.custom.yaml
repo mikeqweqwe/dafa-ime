@@ -1,0 +1,4 @@
+patch:
+  schema_list:
+    - schema: iridium_bpmf
+  "menu/page_size": 9

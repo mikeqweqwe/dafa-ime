@@ -1,0 +1,10 @@
+# 大發輸入法預設行為疊加（不改上游 iridium_bpmf.schema.yaml）
+patch:
+  # 預設中文（上游 reset: 1 是英數）
+  "switches/@0/reset": 0
+  # 空白鍵改「送出第一候選」（比照 iPhone）：
+  # 拿掉 use_space 與 alphabet/finals 中的空白，空白鍵交回前端 commit 第一候選。
+  # 副作用：明打一聲（空白）失效，靠 schema 既有免聲調 abbrev 規則出字（規格接受）。
+  "speller/use_space": false
+  "speller/finals": "6347"
+  "speller/alphabet": "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347"
