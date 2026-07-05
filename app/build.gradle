@@ -11,7 +11,7 @@ android {
         targetSdkVersion 29
         versionCode 20220701
         versionName "3.2.7"
-        setProperty("archivesBaseName", "trime-$versionName")
+        setProperty("archivesBaseName", "dafa-$versionName")
         resValue "string", "trime_url", getGitUrl()
         buildConfigField 'String', 'BUILD_INFO' , '"' + getBuildInfo() + '"'
         buildConfigField 'String', 'BUILD_VERSION' , '"' + "$versionName" + '-g'+ getGitVersion()+ '-' + getBuildDate()  +  '"'
