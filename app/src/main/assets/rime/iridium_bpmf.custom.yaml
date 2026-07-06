@@ -9,6 +9,8 @@ patch:
   "speller/use_space": false
   "speller/finals": "6347"
   "speller/alphabet": "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347"
+  # 手機用點候選列選字，關掉數字鍵選字（否則大千 ㄚㄞㄢ 等在數字鍵位會被當選字鍵）
+  "menu/alternative_select_keys": ""
   "engine/processors":
     - ascii_composer
     - recognizer
