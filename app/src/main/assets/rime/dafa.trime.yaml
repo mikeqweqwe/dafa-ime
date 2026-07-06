@@ -1,0 +1,342 @@
+# Trime custom style settings — 大發輸入法主題
+# encoding: utf-8
+# W3：收合版三鍵盤（zhuyin 預設 / english / number）
+# 大千鍵碼對照：ㄅ=1 ㄆ=q ㄇ=a ㄈ=z ㄉ=2 ㄊ=w ㄋ=s ㄌ=x ㄍ=e ㄎ=d ㄏ=c
+#             ㄐ=r ㄑ=f ㄒ=v ㄓ=5 ㄔ=t ㄕ=g ㄖ=b ㄗ=y ㄘ=h ㄙ=n
+#             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
+#             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
+
+config_version: "3.0"
+name: dafa
+author: Hau Liu
+
+style:
+  auto_caps: false
+  background_dim_amount: 0.5
+  root_background: keyboard_back_color
+  candidate_font: han.ttf
+  candidate_padding: 5
+  candidate_spacing: 0.5
+  candidate_text_size: 18
+  candidate_use_cursor: true
+  candidate_view_height: 28
+  color_scheme: dafa_light
+  comment_font: comment.ttf
+  comment_height: 14
+  comment_on_top: true
+  comment_text_size: 12
+  hanb_font: hanb.ttf
+  horizontal: true
+  horizontal_gap: 4
+  layout:
+    position: fixed
+    min_length: 4
+    max_length: 14
+    sticky_lines: 1
+    sticky_lines_land: 0
+    max_entries: 5
+    border: 0
+    max_width: 360
+    max_height: 300
+    min_width: 0
+    min_height: 50
+    margin_x: 5
+    margin_y: 5
+    line_spacing: 0
+    line_spacing_multiplier: 1.2
+    real_margin: 3
+    spacing: 1
+    round_corner: 0
+    alpha: 0xff
+    elevation: 0
+    background: background.png
+    movable: false
+    all_phrases: false
+  key_font: symbol.ttf
+  key_height: 48
+  key_long_text_size: 16
+  key_text_size: 22
+  key_width: 10.0
+  keyboards: [zhuyin, english, number]
+  label_text_size: 20
+  label_font: label.ttf
+  latin_font: latin.ttf
+  latin_locale: en_US
+  locale: zh_TW
+  keyboard_height: 250
+  keyboard_height_land: 200
+  preview_font: latin.ttf
+  preview_height: 56
+  preview_offset: -32
+  preview_text_size: 40
+  proximity_correction: true
+  reset_ascii_mode: false
+  round_corner: 12
+  shadow_radius: 0.0
+  speech_opencc_config: none
+  symbol_font: symbol.ttf
+  symbol_text_size: 10
+  text_font: latin.ttf
+  text_size: 14
+  vertical_correction: -5
+  vertical_gap: 8
+  enter_label_mode: 0
+  enter_labels:
+    go: 前往
+    done: 完成
+    next: 下個
+    pre: 上個
+    search: 搜尋
+    send: 傳送
+    default: 完成
+
+fallback_colors:
+  candidate_text_color: text_color
+  comment_text_color: candidate_text_color
+  border_color: back_color
+  candidate_separator_color: border_color
+  hilited_text_color: text_color
+  hilited_back_color: back_color
+  hilited_candidate_text_color: hilited_text_color
+  hilited_candidate_back_color: hilited_back_color
+  hilited_comment_text_color: comment_text_color
+  hilited_key_back_color: hilited_candidate_back_color
+  hilited_key_text_color: hilited_candidate_text_color
+  hilited_key_symbol_color: hilited_comment_text_color
+  hilited_off_key_back_color: hilited_key_back_color
+  hilited_on_key_back_color: hilited_key_back_color
+  hilited_off_key_text_color: hilited_key_text_color
+  hilited_on_key_text_color: hilited_key_text_color
+  key_back_color: back_color
+  key_border_color: border_color
+  key_text_color: candidate_text_color
+  key_symbol_color: comment_text_color
+  label_color: candidate_text_color
+  off_key_back_color: key_back_color
+  off_key_text_color: key_text_color
+  on_key_back_color: hilited_key_back_color
+  on_key_text_color: hilited_key_text_color
+  preview_back_color: key_text_color
+  preview_text_color: key_back_color
+  shadow_color: border_color
+  root_background: back_color
+  candidate_background: back_color
+  keyboard_back_color: border_color
+  liquid_keyboard_background: keyboard_back_color
+  text_back_color: back_color
+  long_text_back_color: key_back_color
+
+preset_color_schemes:
+  dafa_light:
+    name: "大發／淺色"
+    author: Hau Liu
+    back_color: 0xffe8e9eb
+    border_color: 0xffe8e9eb
+    candidate_text_color: 0xff1c1c1e
+    comment_text_color: 0xff8e8e93
+    hilited_back_color: 0xffffffff
+    hilited_candidate_back_color: 0xffffffff
+    hilited_candidate_text_color: 0xff0e9b8e
+    hilited_comment_text_color: 0xff1c1c1e
+    hilited_key_back_color: 0xffb8bcc4
+    hilited_key_symbol_color: 0xff1c1c1e
+    hilited_key_text_color: 0xff1c1c1e
+    hilited_off_key_back_color: 0xffffffff
+    hilited_off_key_text_color: 0xff1c1c1e
+    hilited_text_color: 0xff1c1c1e
+    key_back_color: 0xffffffff
+    key_symbol_color: 0xff1c1c1e
+    key_text_color: 0xff1c1c1e
+    keyboard_back_color: 0xffe8e9eb
+    label_color: 0xff1c1c1e
+    off_key_back_color: 0xffaeb2ba
+    off_key_text_color: 0xff1c1c1e
+    preview_back_color: 0xffffffff
+    preview_text_color: 0xff1c1c1e
+    text_color: 0xff0e9b8e
+    text_back_color: 0xffffffff
+
+preset_keys:
+  Shift_L: {label: ⇧, functional: false, send: Shift_L, shift_lock: ascii_long}
+  Return: {label: enter_labels, functional: false, send: Return}
+  BackSpace: {label: ⌫, repeatable: true, functional: false, send: BackSpace}
+  space: {repeatable: false, functional: false, label: ' ', send: space}
+  Keyboard_zhuyin: {label: 注音, functional: false, send: Eisu_toggle, select: zhuyin}
+  Keyboard_english: {label: "🌐", functional: false, send: Eisu_toggle, select: english}
+  Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
+  Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: number}
+  Mic_placeholder: {label: 聲, functional: false, send: VoidSymbol}
+
+preset_keyboards:
+  zhuyin:
+    name: 注音鍵盤（收合）
+    author: Hau Liu
+    ascii_mode: 0
+    width: 10
+    height: 48
+    lock: true
+    keys:
+      # 第1排：ㄅㄉˇˋㄓˊ˙ㄚㄞㄢㄦ（11鍵）
+      - {label: 'ㄅ', click: '1', width: 9.09}
+      - {label: 'ㄉ', click: '2', width: 9.09}
+      - {label: 'ˇ', click: '3', width: 9.09}
+      - {label: 'ˋ', click: '4', width: 9.09}
+      - {label: 'ㄓ', click: '5', width: 9.09}
+      - {label: 'ˊ', click: '6', width: 9.09}
+      - {label: '˙', click: '7', width: 9.09}
+      - {label: 'ㄚ', click: '8', width: 9.09}
+      - {label: 'ㄞ', click: '9', width: 9.09}
+      - {label: 'ㄢ', click: '0', width: 9.09}
+      - {label: 'ㄦ', click: '-', width: 9.1}
+
+      # 第2排：腰身留邊5，ㄆㄊㄍㄐㄔㄗㄧㄛㄟㄣ（10鍵）
+      - {width: 5}
+      - {label: 'ㄆ', click: q, width: 9}
+      - {label: 'ㄊ', click: w, width: 9}
+      - {label: 'ㄍ', click: e, width: 9}
+      - {label: 'ㄐ', click: r, width: 9}
+      - {label: 'ㄔ', click: t, width: 9}
+      - {label: 'ㄗ', click: y, width: 9}
+      - {label: 'ㄧ', click: u, width: 9}
+      - {label: 'ㄛ', click: i, width: 9}
+      - {label: 'ㄟ', click: o, width: 9}
+      - {label: 'ㄣ', click: p, width: 9}
+      - {width: 5}
+
+      # 第3排：腰身留邊7.5，ㄇㄋㄎㄑㄕㄘㄨㄜㄠㄤ（10鍵）
+      - {width: 7.5}
+      - {label: 'ㄇ', click: a, width: 8.5}
+      - {label: 'ㄋ', click: s, width: 8.5}
+      - {label: 'ㄎ', click: d, width: 8.5}
+      - {label: 'ㄑ', click: f, width: 8.5}
+      - {label: 'ㄕ', click: g, width: 8.5}
+      - {label: 'ㄘ', click: h, width: 8.5}
+      - {label: 'ㄨ', click: j, width: 8.5}
+      - {label: 'ㄜ', click: k, width: 8.5}
+      - {label: 'ㄠ', click: l, width: 8.5}
+      - {label: 'ㄤ', click: ';', width: 8.5}
+      - {width: 7.5}
+
+      # 第4排：ㄈㄌㄏㄒㄖㄙㄩㄝㄡㄥ＋⌫
+      - {label: 'ㄈ', click: z, width: 8.5}
+      - {label: 'ㄌ', click: x, width: 8.5}
+      - {label: 'ㄏ', click: c, width: 8.5}
+      - {label: 'ㄒ', click: v, width: 8.5}
+      - {label: 'ㄖ', click: b, width: 8.5}
+      - {label: 'ㄙ', click: n, width: 8.5}
+      - {label: 'ㄩ', click: m, width: 8.5}
+      - {label: 'ㄝ', click: ',', width: 8.5}
+      - {label: 'ㄡ', click: '.', width: 8.5}
+      - {label: 'ㄥ', click: '/', width: 8.5}
+      - {click: BackSpace, width: 15}
+
+      # 第5排：123 / 符號 / 空白 / Enter
+      - {click: Keyboard_number, width: 18}
+      - {click: Keyboard_symbol, width: 18}
+      - {click: space, width: 46}
+      - {click: Return, width: 18}
+
+      # 第6排（矮排）：地球（切英文） …… 麥克風（占位）
+      - {click: Keyboard_english, height: 26, width: 15}
+      - {width: 70, height: 26}
+      - {click: Mic_placeholder, height: 26, width: 15}
+
+  english:
+    name: 英文鍵盤（收合）
+    author: Hau Liu
+    ascii_mode: 1
+    width: 10
+    height: 48
+    lock: true
+    keys:
+      # 第1排：QWERTYUIOP（10鍵）
+      - {click: q, width: 10}
+      - {click: w, width: 10}
+      - {click: e, width: 10}
+      - {click: r, width: 10}
+      - {click: t, width: 10}
+      - {click: y, width: 10}
+      - {click: u, width: 10}
+      - {click: i, width: 10}
+      - {click: o, width: 10}
+      - {click: p, width: 10}
+
+      # 第2排：ASDFGHJKL（9鍵，留邊5）
+      - {width: 5}
+      - {click: a, width: 10}
+      - {click: s, width: 10}
+      - {click: d, width: 10}
+      - {click: f, width: 10}
+      - {click: g, width: 10}
+      - {click: h, width: 10}
+      - {click: j, width: 10}
+      - {click: k, width: 10}
+      - {click: l, width: 10}
+      - {width: 5}
+
+      # 第3排：⇧ + ZXCVBNM + ⌫
+      - {click: Shift_L, width: 15}
+      - {click: z, width: 10}
+      - {click: x, width: 10}
+      - {click: c, width: 10}
+      - {click: v, width: 10}
+      - {click: b, width: 10}
+      - {click: n, width: 10}
+      - {click: m, width: 10}
+      - {click: BackSpace, width: 15}
+
+      # 第4排：123 / 符號 / 空白 / Enter
+      - {click: Keyboard_number, width: 18}
+      - {click: Keyboard_symbol, width: 18}
+      - {click: space, width: 46}
+      - {click: Return, width: 18}
+
+      # 第5排（矮排）：地球（切回注音） …… 麥克風（占位）
+      - {click: Keyboard_zhuyin, height: 26, width: 15}
+      - {width: 70, height: 26}
+      - {click: Mic_placeholder, height: 26, width: 15}
+
+  number:
+    name: 數字符號鍵盤
+    author: Hau Liu
+    ascii_mode: 1
+    width: 10
+    height: 48
+    keys:
+      # 第1排：1234567890
+      - {click: '1', width: 10}
+      - {click: '2', width: 10}
+      - {click: '3', width: 10}
+      - {click: '4', width: 10}
+      - {click: '5', width: 10}
+      - {click: '6', width: 10}
+      - {click: '7', width: 10}
+      - {click: '8', width: 10}
+      - {click: '9', width: 10}
+      - {click: '0', width: 10}
+
+      # 第2排：－／：；（）＄＆＠「」（全形標點直接送字）
+      - {click: '－', width: 10}
+      - {click: '／', width: 10}
+      - {click: '：', width: 10}
+      - {click: '；', width: 10}
+      - {click: '（', width: 10}
+      - {click: '）', width: 10}
+      - {click: '＄', width: 10}
+      - {click: '＆', width: 10}
+      - {click: '＠', width: 10}
+      - {click: '「」', width: 10}
+
+      # 第3排：#+=（占位切回本頁）／。／，／？／！／、／⌫
+      - {click: Keyboard_symbol, width: 14.3}
+      - {click: '。', width: 14.3}
+      - {click: '，', width: 14.3}
+      - {click: '？', width: 14.3}
+      - {click: '！', width: 14.3}
+      - {click: '、', width: 14.3}
+      - {click: BackSpace, width: 14.2}
+
+      # 第4排：注音（切回zhuyin） / 空白 / Enter
+      - {click: Keyboard_zhuyin, width: 18}
+      - {click: space, width: 64}
+      - {click: Return, width: 18}
