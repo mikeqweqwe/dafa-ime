@@ -8,7 +8,7 @@
 name: iridium_bpmf_ext
 version: '20180503'
 sort: by_weight
-use_preset_vocabulary: true
+use_preset_vocabulary: false
 import_tables:
   - mcbopomofo
 ...

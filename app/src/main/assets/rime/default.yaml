@@ -1,0 +1,56 @@
+# Rime default settings — 大發輸入法
+# 直接提供底稿（上游未附 default.yaml，僅 default.custom.yaml 補丁無底稿可貼）
+config_version: "0.42"
+
+schema_list:
+  - schema: iridium_bpmf
+
+switcher:
+  caption: 〔方案選單〕
+  hotkeys:
+    - Control+grave
+    - Control+Shift+grave
+  save_options:
+    - full_shape
+    - ascii_punct
+    - simplification
+  fold_options: true
+  abbreviate_options: true
+  option_list_separator: '/'
+
+menu:
+  page_size: 9
+
+ascii_composer:
+  good_old_caps_lock: true
+  switch_key:
+    Shift_L: commit_code
+    Shift_R: inline_ascii
+    Control_L: noop
+    Control_R: noop
+    Caps_Lock: clear
+    Eisu_toggle: clear
+
+key_binder:
+  bindings:
+    # 上一頁/下一頁
+    - {when: paging, accept: Page_Up, send: Page_Up}
+    - {when: has_menu, accept: Page_Down, send: Page_Down}
+    - {when: paging, accept: comma, send: Page_Up}
+    - {when: has_menu, accept: period, send: Page_Down}
+
+punctuator:
+  full_shape:
+    ',': '，'
+    '.': '。'
+    '?': '？'
+    '!': '！'
+    ':': '：'
+    ';': '；'
+  half_shape:
+    ',': ','
+    '.': '.'
+
+recognizer:
+  patterns:
+    punct: '^/([0-9]0?|[A-Za-z]+)$'
