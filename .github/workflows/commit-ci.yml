@@ -2,6 +2,8 @@ name: commit ci
 on: [push]
 env:
   CI_NAME: Commit CI
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -60,3 +62,9 @@ jobs:
           path: app/build/intermediates/stripped_native_libs/debug/out/lib/*
           # keep 90 days
           retention-days: 90
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dafa-${{ github.run_number }}-${{ github.run_attempt }}
+          files: app/build/outputs/apk/**/*.apk
