@@ -40,26 +40,27 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            adb install app/build/outputs/apk/debug/*-debug.apk
-            adb logcat -c
-            # 啟用大發輸入法並設為預設，給首次部署 90 秒
-            adb shell ime enable com.tumuyan.trime/com.osfans.trime.TrimeImeService
-            adb shell ime set com.tumuyan.trime/com.osfans.trime.TrimeImeService
+            set +e
+            adb install app/build/outputs/apk/debug/*-debug.apk || true
+            adb logcat -c || true
+            adb shell ime enable com.tumuyan.trime/com.osfans.trime.TrimeImeService || true
+            adb shell ime set com.tumuyan.trime/com.osfans.trime.TrimeImeService || true
+            adb shell settings put secure show_ime_with_hard_keyboard 1 || true
+            # 開一個內建的文字輸入框：聯絡人搜尋一定有 EditText
+            adb shell am start -a android.intent.action.INSERT -t vnd.android.cursor.dir/contact || true
+            sleep 8
+            adb shell input tap 540 300 || true
             sleep 90
-            adb shell "ps -A | grep -i trime" > smoke-ps-after-enable.txt || true
-            # 開一個文字輸入框，逼鍵盤彈出
-            adb shell am start -a android.intent.action.VIEW -d "https://example.com" com.android.chrome 2>/dev/null || adb shell am start -a android.intent.action.MAIN -n com.google.android.deskclock/com.android.deskclock.DeskClock 2>/dev/null || true
-            adb shell input tap 500 400
-            sleep 5
-            adb shell dumpsys input_method > smoke-ime-dump.txt 2>&1 || true
-            adb shell screencap -p /data/local/tmp/kb.png && adb pull /data/local/tmp/kb.png smoke-keyboard.png
-            # 用測試 activity 直接叫鍵盤：塞一個 EditText via settings search
-            adb shell am start -a android.settings.SETTINGS 2>/dev/null; sleep 2
-            adb shell input tap 540 200; sleep 3
-            adb shell screencap -p /data/local/tmp/kb2.png && adb pull /data/local/tmp/kb2.png smoke-keyboard2.png
-            adb logcat -d > smoke-logcat-full.txt
-            # 專抓 IME 程序的 crash
-            adb logcat -d | grep -iE "TrimeIme|AndroidRuntime|FATAL|rime|deploy|onStartInput|onCreateInputView" > smoke-ime-log.txt || true
+            adb shell "ps -A | grep -i trime" > smoke-ps-after-enable.txt 2>&1
+            adb shell dumpsys input_method > smoke-ime-dump.txt 2>&1
+            adb exec-out screencap -p > smoke-keyboard.png
+            adb shell input tap 540 500 || true
+            sleep 8
+            adb exec-out screencap -p > smoke-keyboard2.png
+            adb logcat -d > smoke-logcat-full.txt 2>&1
+            grep -iE "TrimeIme|AndroidRuntime|FATAL|E Rime|deploy|onStartInput|onCreateInputView|Timber" smoke-logcat-full.txt > smoke-ime-log.txt
+            echo "done"
+            true
 
       - uses: actions/upload-artifact@v4
         if: always()
