@@ -19,7 +19,7 @@ style:
   candidate_spacing: 0.5
   candidate_text_size: 18
   candidate_use_cursor: true
-  candidate_view_height: 40
+  candidate_view_height: 28
   color_scheme: dafa_light
   comment_font: comment.ttf
   comment_height: 14
@@ -63,14 +63,14 @@ style:
   latin_font: latin.ttf
   latin_locale: en_US
   locale: zh_TW
-  keyboard_height: 320
-  keyboard_height_land: 260
+  keyboard_height: 250
+  keyboard_height_land: 200
   preview_font: latin.ttf
   preview_height: 56
   preview_offset: -32
   preview_text_size: 40
   proximity_correction: true
-  reset_ascii_mode: true
+  reset_ascii_mode: false
   round_corner: 12
   shadow_radius: 0.0
   speech_opencc_config: none
@@ -78,7 +78,7 @@ style:
   symbol_text_size: 10
   text_font: latin.ttf
   text_size: 14
-  vertical_correction: 0
+  vertical_correction: -5
   vertical_gap: 8
   enter_label_mode: 0
   enter_labels:
@@ -161,8 +161,6 @@ preset_keys:
   Return: {label: enter_labels, functional: false, send: Return}
   BackSpace: {label: ⌫, repeatable: true, functional: false, send: BackSpace}
   space: {repeatable: false, functional: false, label: ' ', send: space}
-  # 切換鍵必須 send: Eisu_toggle（keycode 212）——Trime 只有這個分支會「換鍵盤+切 ascii_mode」；
-  # 改 VoidSymbol 會落入一般按鍵、不切 ascii_mode，反而弄壞中英切換（agent 讀原始碼證實，回退 issue#1 誤導）
   Keyboard_zhuyin: {label: 注音, functional: false, send: Eisu_toggle, select: zhuyin}
   Keyboard_english: {label: "🌐", functional: false, send: Eisu_toggle, select: english}
   Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
@@ -317,16 +315,16 @@ preset_keyboards:
       - {click: '9', width: 10}
       - {click: '0', width: 10}
 
-      # 第2排：- / : ; ( ) $ & @「」（半形符號直接送字；「」保留全形中文引號）
-      - {click: '-', width: 10}
-      - {click: '/', width: 10}
-      - {click: ':', width: 10}
-      - {click: ';', width: 10}
-      - {click: '(', width: 10}
-      - {click: ')', width: 10}
-      - {click: '$', width: 10}
-      - {click: '&', width: 10}
-      - {click: '@', width: 10}
+      # 第2排：－／：；（）＄＆＠「」（全形標點直接送字）
+      - {click: '－', width: 10}
+      - {click: '／', width: 10}
+      - {click: '：', width: 10}
+      - {click: '；', width: 10}
+      - {click: '（', width: 10}
+      - {click: '）', width: 10}
+      - {click: '＄', width: 10}
+      - {click: '＆', width: 10}
+      - {click: '＠', width: 10}
       - {click: '「」', width: 10}
 
       # 第3排：#+=（占位切回本頁）／。／，／？／！／、／⌫
