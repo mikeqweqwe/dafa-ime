@@ -70,7 +70,7 @@ style:
   preview_offset: -32
   preview_text_size: 40
   proximity_correction: true
-  reset_ascii_mode: false
+  reset_ascii_mode: true
   round_corner: 12
   shadow_radius: 0.0
   speech_opencc_config: none
@@ -161,10 +161,10 @@ preset_keys:
   Return: {label: enter_labels, functional: false, send: Return}
   BackSpace: {label: ⌫, repeatable: true, functional: false, send: BackSpace}
   space: {repeatable: false, functional: false, label: ' ', send: space}
-  Keyboard_zhuyin: {label: 注音, functional: false, send: Eisu_toggle, select: zhuyin}
-  Keyboard_english: {label: "🌐", functional: false, send: Eisu_toggle, select: english}
-  Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
-  Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: number}
+  Keyboard_zhuyin: {label: 注音, functional: true, send: VoidSymbol, select: zhuyin}
+  Keyboard_english: {label: "🌐", functional: true, send: VoidSymbol, select: english}
+  Keyboard_number: {label: 123, functional: true, send: VoidSymbol, select: number}
+  Keyboard_symbol: {label: "#+=", functional: true, send: VoidSymbol, select: number}
   Mic_placeholder: {label: 聲, functional: false, send: VoidSymbol}
 
 preset_keyboards:
@@ -315,16 +315,16 @@ preset_keyboards:
       - {click: '9', width: 10}
       - {click: '0', width: 10}
 
-      # 第2排：－／：；（）＄＆＠「」（全形標點直接送字）
-      - {click: '－', width: 10}
-      - {click: '／', width: 10}
-      - {click: '：', width: 10}
-      - {click: '；', width: 10}
-      - {click: '（', width: 10}
-      - {click: '）', width: 10}
-      - {click: '＄', width: 10}
-      - {click: '＆', width: 10}
-      - {click: '＠', width: 10}
+      # 第2排：- / : ; ( ) $ & @「」（半形符號直接送字；「」保留全形中文引號）
+      - {click: '-', width: 10}
+      - {click: '/', width: 10}
+      - {click: ':', width: 10}
+      - {click: ';', width: 10}
+      - {click: '(', width: 10}
+      - {click: ')', width: 10}
+      - {click: '$', width: 10}
+      - {click: '&', width: 10}
+      - {click: '@', width: 10}
       - {click: '「」', width: 10}
 
       # 第3排：#+=（占位切回本頁）／。／，／？／！／、／⌫

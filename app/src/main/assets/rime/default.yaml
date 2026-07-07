@@ -29,15 +29,14 @@ ascii_composer:
     Control_L: noop
     Control_R: noop
     Caps_Lock: clear
-    Eisu_toggle: clear
+    Eisu_toggle: noop
 
 key_binder:
   bindings:
     # 上一頁/下一頁
     - {when: paging, accept: Page_Up, send: Page_Up}
     - {when: has_menu, accept: Page_Down, send: Page_Down}
-    - {when: paging, accept: comma, send: Page_Up}
-    - {when: has_menu, accept: period, send: Page_Down}
+    # 移除 comma/period 翻頁綁定：大千 ㄝ(',')、ㄡ('.') 會被當翻頁鍵吃掉（B1）
 
 punctuator:
   full_shape:
