@@ -320,8 +320,8 @@ preset_keyboards:
       # 第2排：- / : ; ( ) $ & @「」（半形符號直接送字；「」保留全形中文引號）
       - {click: '-', width: 10}
       - {click: '/', width: 10}
-      - {commit: ':', width: 10}
-      - {commit: ';', width: 10}
+      - {click: ':', width: 10}
+      - {click: ';', width: 10}
       - {click: '(', width: 10}
       - {click: ')', width: 10}
       - {click: '$', width: 10}
