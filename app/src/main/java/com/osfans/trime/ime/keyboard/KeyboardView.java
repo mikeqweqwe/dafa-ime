@@ -35,6 +35,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -205,6 +206,12 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
   private static int REPEAT_INTERVAL = 50; // ~20 keys per second
   private static int REPEAT_START_DELAY = 400;
   private static int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
+
+  // 空白鍵 trackpad：長按進入，左右拖曳連續移游標（組字中移 preedit 補注音、非組字移文字游標）
+  private boolean mSpaceTrackpad = false;
+  private int mTrackpadLastX;
+  private int mTrackpadRemainderX;
+  private int mTrackpadStepPx;
 
   private static final int MAX_NEARBY_KEYS = 12;
   private final int[] mDistances = new int[MAX_NEARBY_KEYS];
@@ -1338,6 +1345,16 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
   }
 
   private boolean openPopupIfRequired(final MotionEvent me) {
+    // 長按空白（無自訂長按事件時）進入 trackpad 拖曳模式；放在 popup 檢查前，
+    // 主題沒配 popup layout 也要能觸發
+    if (mCurrentKey >= 0
+        && mCurrentKey < mKeys.length
+        && mKeys[mCurrentKey].getClick() != null
+        && mKeys[mCurrentKey].getClick().getCode() == KeyEvent.KEYCODE_SPACE
+        && !mKeys[mCurrentKey].hasEvent(KeyEventType.LONG_CLICK.ordinal())) {
+      enterSpaceTrackpad();
+      return true;
+    }
     // Check if we have a popup layout specified first.
     if (mPopupLayout == 0) {
       return false;
@@ -1354,6 +1371,40 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
       showPreview(NOT_A_KEY);
     }
     return result;
+  }
+
+  private void enterSpaceTrackpad() {
+    mSpaceTrackpad = true;
+    // 用最新座標（mLastX 每次 touch 事件尾端更新）；msg.obj 的 MotionEvent 是排程當下的
+    // 舊事件，手指在長按前的漂移量會讓第一步跳多格
+    mTrackpadLastX = mLastX;
+    mTrackpadRemainderX = 0;
+    mTrackpadStepPx = computeTrackpadStepPx();
+    mHandler.removeMessages(MSG_REPEAT);
+    showPreview(NOT_A_KEY);
+    // 半透明作為「游標模式」視覺回饋（iOS 是鍵帽全變空白，先用最小方案）
+    setAlpha(0.6f);
+  }
+
+  private void finishSpaceTrackpad() {
+    mSpaceTrackpad = false;
+    // 吞掉這次 touch 的 click，放開手指不上屏空白
+    mAbortKey = true;
+    removeMessages();
+    setAlpha(1f);
+    showPreview(NOT_A_KEY);
+    invalidateAllKeys();
+  }
+
+  /** 拖多遠移一步：普通鍵寬的一半，夾在 12~32dp 之間，跟 iOS 一字元一格的手感對齊 */
+  private int computeTrackpadStepPx() {
+    int normal = Integer.MAX_VALUE;
+    for (Key k : mKeys) {
+      if (k.isPreviewable()) normal = Math.min(normal, k.getWidth());
+    }
+    if (normal == Integer.MAX_VALUE) normal = getWidth() / 10;
+    final float density = getResources().getDisplayMetrics().density;
+    return Math.max((int) (12 * density), Math.min((int) (32 * density), normal / 2));
   }
 
   /**
@@ -1585,6 +1636,26 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
       return true;
     }
 
+    // trackpad 模式吃掉整條 touch 流（含 gesture detector），拖曳距離換算成游標步數
+    if (mSpaceTrackpad) {
+      if (action == MotionEvent.ACTION_MOVE) {
+        mTrackpadRemainderX += touchX - mTrackpadLastX;
+        mTrackpadLastX = touchX;
+        int steps = Math.min(Math.abs(mTrackpadRemainderX) / mTrackpadStepPx, 6);
+        if (steps > 0) {
+          final boolean right = mTrackpadRemainderX > 0;
+          final int code = right ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
+          for (int i = 0; i < steps; i++) mKeyboardActionListener.onKey(code, 0);
+          mTrackpadRemainderX -= (right ? 1 : -1) * steps * mTrackpadStepPx;
+        }
+      } else if (action == MotionEvent.ACTION_UP
+          || action == MotionEvent.ACTION_POINTER_UP
+          || action == MotionEvent.ACTION_CANCEL) {
+        finishSpaceTrackpad();
+      }
+      return true;
+    }
+
     // 优先判定是否触发了滑动手势
     if (getPrefs().getKeyboard().getSwipeEnabled()) {
       if (mGestureDetector.onTouchEvent(me)) {
@@ -1771,6 +1842,10 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
   public void closing() {
     if (mPreviewPopup.isShowing()) {
       mPreviewPopup.dismiss();
+    }
+    if (mSpaceTrackpad) {
+      mSpaceTrackpad = false;
+      setAlpha(1f);
     }
     removeMessages();
 
