@@ -62,10 +62,12 @@ fi
 
 adb exec-out screencap -p > smoke-keyboard.png || true
 
-# 加拍：符號頁（#+= 在注音頁第5排 x~27%）與深色模式（驗 dark_scheme 自動切換）
-adb shell input tap $((W * 27 / 100)) $((H * 88 / 100)) || true
+# 加拍：數字頁（123 在注音頁第5排 x~9%；dafa.19 起 27% 是 emoji 鍵，別點）與深色模式
+adb shell input tap $((W * 9 / 100)) $((H * 88 / 100)) || true
 sleep 2
-adb exec-out screencap -p > smoke-keyboard-symbol.png || true
+adb exec-out screencap -p > smoke-keyboard-number.png || true
+adb shell input tap $((W * 9 / 100)) $((H * 88 / 100)) || true
+sleep 1
 adb shell cmd uimode night yes || true
 sleep 3
 adb exec-out screencap -p > smoke-keyboard-dark.png || true

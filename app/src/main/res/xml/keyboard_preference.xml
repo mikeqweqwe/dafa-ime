@@ -44,13 +44,15 @@
             android:title="@string/keyboard__soft_cursor_title"
             app:iconSpaceReserved="false" />
 
+        <!-- defaultValue 必須與 AppPrefs.kt 的 Kotlin 預設一致：setDefaultValues 會把這裡的值
+             持久化寫進 prefs、蓋掉 Kotlin 預設（dafa.15 user_data_dir 同款雷） -->
         <SwitchPreferenceCompat
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="keyboard__show_switches"
             android:title="@string/keyboard__show_switches_title"
             app:iconSpaceReserved="false" />
         <SwitchPreferenceCompat
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="keyboard__show_switch_arrow"
             android:title="@string/keyboard__show_switche_arrow_title"
             app:iconSpaceReserved="false" />

@@ -197,11 +197,12 @@ class TextInputManager private constructor() :
                         // 並分流到對應鍵盤：純數字/日期→九宮格、電話→電話盤
                         InputType.TYPE_CLASS_NUMBER -> {
                             tempAsciiMode = true
-                            "numpad"
+                            // 舊主題沒有九宮格鍵盤：退回 number 頁，別讓 indexOf=-1 落到預設鍵盤
+                            if (keyboardSwitcher.keyboardNames.contains("numpad")) "numpad" else "number"
                         }
                         InputType.TYPE_CLASS_PHONE -> {
                             tempAsciiMode = true
-                            "phonepad"
+                            if (keyboardSwitcher.keyboardNames.contains("phonepad")) "phonepad" else "number"
                         }
                         InputType.TYPE_CLASS_DATETIME -> {
                             // 日期時間需要 : / - 分隔符，九宮格放不下 → 用數字符號頁
