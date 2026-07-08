@@ -573,22 +573,27 @@ public class Key {
 
   public String getLabel() {
     Event event = getEvent();
+    // 沒定義 ascii 事件的鍵（注音鍵）任何模式都顯示鍵面標籤：click 是大千碼（ㄅ=1），
+    // 英數殘留態下若 fallback 到 event.getLabel() 整片鍵帽會變成 1qaz2wsx
     if (!TextUtils.isEmpty(label)
         && event == getClick()
-        && (events[KeyEventType.ASCII.ordinal()] == null && !Rime.isAsciiMode()))
-      return label; // 中文狀態顯示標籤
+        && events[KeyEventType.ASCII.ordinal()] == null)
+      return label;
     return event.getLabel();
   }
 
   public String getPreviewText(int type) {
-    if (type == KeyEventType.CLICK.ordinal()) {
-      // 泡泡顯示鍵面實際字（注音鍵 click 是大千鍵碼「1」，泡泡要顯示「ㄅ」）
-      final String displayLabel = getLabel();
-      if (!TextUtils.isEmpty(displayLabel) && !"enter_labels".equals(displayLabel))
-        return displayLabel;
-      return getEvent().getPreviewText();
+    if (type != KeyEventType.CLICK.ordinal()) {
+      // 只有該型別真有專屬事件才顯示其字元（如長按出符號）；沒定義時 getEvent 會
+      // fallback 回 click，泡泡不能跟著變成 click 原始碼（注音鍵會閃成大千碼 q）
+      final Event e = getEvent(type);
+      if (e != getClick()) return e.getPreviewText();
     }
-    return getEvent(type).getPreviewText();
+    // 泡泡顯示鍵面實際字（注音鍵 click 是大千鍵碼「1」，泡泡要顯示「ㄅ」）
+    final String displayLabel = getLabel();
+    if (!TextUtils.isEmpty(displayLabel) && !"enter_labels".equals(displayLabel))
+      return displayLabel;
+    return getEvent().getPreviewText();
   }
 
   /** iOS 式泡泡只對字元鍵彈出：空白/⏎/⌫/⇧/鍵盤切換/功能鍵不彈 */
