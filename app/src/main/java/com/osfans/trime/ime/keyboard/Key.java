@@ -577,8 +577,7 @@ public class Key {
     // 英數殘留態下若 fallback 到 event.getLabel() 整片鍵帽會變成 1qaz2wsx
     if (!TextUtils.isEmpty(label)
         && event == getClick()
-        && events[KeyEventType.ASCII.ordinal()] == null)
-      return label;
+        && events[KeyEventType.ASCII.ordinal()] == null) return label;
     return event.getLabel();
   }
 
