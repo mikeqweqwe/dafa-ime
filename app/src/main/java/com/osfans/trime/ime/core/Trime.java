@@ -1048,6 +1048,22 @@ public class Trime extends LifecycleInputMethodService {
   // 处理键盘事件(Android keycode)
   public boolean handleKey(int keyEventCode, int metaState) { // 軟鍵盤
     textInputManager.setNeedSendUpRimeKey(false);
+    // 組字中按 Enter＝確認目前組字上屏（iOS/Gboard 行為），不換行。不能讓 Return 進
+    // librime：fluency_editor 對 Return 會 commit 原始大千碼／分段殘渣（英數外洩）。
+    // 只攔無 chord modifier 的 Enter，Ctrl/Shift+Enter 等組合鍵留給 RIME
+    final int chordMask =
+        KeyEvent.META_CTRL_MASK
+            | KeyEvent.META_ALT_MASK
+            | KeyEvent.META_SHIFT_MASK
+            | KeyEvent.META_META_MASK;
+    if ((keyEventCode == KeyEvent.KEYCODE_ENTER
+            || keyEventCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+        && (metaState & chordMask) == 0
+        && Rime.isComposing()) {
+      Rime.commitComposition();
+      activeEditorInstance.commitRimeText();
+      return true;
+    }
     if (onRimeKey(Event.getRimeEvent(keyEventCode, metaState))) {
       // 如果输入法消费了按键事件，则需要释放按键
       textInputManager.setNeedSendUpRimeKey(true);

@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.16"
+config_version: "3.17"
 name: dafa
 author: Hau Liu
 
@@ -282,7 +282,7 @@ preset_keyboards:
       # 第5排：123 / 😀 / 空白（注 hint） / Enter——對齊 iOS 底排；#+= 走 123 進符號頁
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: liquid_keyboard_emoji, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 46, swipe_left: Left, swipe_right: Right, hint: "注", key_hint_offset_x: 55, key_hint_offset_y: -3, key_symbol_color: comment_text_color, hilited_key_symbol_color: hilited_comment_text_color}
+      - {click: space, width: 46, hint: "注", key_hint_offset_x: 55, key_hint_offset_y: -3, key_symbol_color: comment_text_color, hilited_key_symbol_color: hilited_comment_text_color}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第6排（矮排）：地球（切英文） …… 麥克風（占位）
@@ -337,7 +337,7 @@ preset_keyboards:
       # 第4排：123 / 符號 / 空白 / Enter
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: liquid_keyboard_emoji, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 46, swipe_left: Left, swipe_right: Right}
+      - {click: space, width: 46}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切回注音） …… 麥克風（占位）
@@ -387,7 +387,7 @@ preset_keyboards:
 
       # 第4排：注音（切回zhuyin） / 空白 / Enter
       - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 64, swipe_left: Left, swipe_right: Right}
+      - {click: space, width: 64}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
@@ -437,7 +437,7 @@ preset_keyboards:
 
       # 第4排：注音（切回zhuyin） / 空白 / Enter
       - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 64, swipe_left: Left, swipe_right: Right}
+      - {click: space, width: 64}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
