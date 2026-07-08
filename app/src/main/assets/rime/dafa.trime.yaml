@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.12"
+config_version: "3.14"
 name: dafa
 author: Hau Liu
 
@@ -27,7 +27,9 @@ style:
   comment_text_size: 12
   hanb_font: hanb.ttf
   horizontal: true
-  horizontal_gap: 4
+  # 間距/高度對齊 iOS 比例（iPhone 鍵 33x42pt、水平 gap 6、行距 11）：
+  # 鍵要「瘦高」不要寬扁——gap 大、行距大、總高 290 讓 scale 後鍵高約 41dp
+  horizontal_gap: 7
   layout:
     position: fixed
     min_length: 4
@@ -55,7 +57,7 @@ style:
   key_font: symbol.ttf
   key_height: 48
   key_long_text_size: 16
-  key_text_size: 22
+  key_text_size: 20
   key_width: 10.0
   keyboards: [zhuyin, english, number, symbol]
   label_text_size: 20
@@ -63,7 +65,7 @@ style:
   latin_font: latin.ttf
   latin_locale: en_US
   locale: zh_TW
-  keyboard_height: 250
+  keyboard_height: 290
   keyboard_height_land: 200
   preview_font: latin.ttf
   preview_height: 56
@@ -71,7 +73,7 @@ style:
   preview_text_size: 40
   proximity_correction: true
   reset_ascii_mode: false
-  round_corner: 12
+  round_corner: 9
   shadow_radius: 0.0
   speech_opencc_config: none
   symbol_font: symbol.ttf
@@ -79,7 +81,7 @@ style:
   text_font: latin.ttf
   text_size: 14
   vertical_correction: -5
-  vertical_gap: 8
+  vertical_gap: 11
   enter_label_mode: 0
   enter_labels:
     go: 前往
@@ -88,7 +90,7 @@ style:
     pre: 上個
     search: 搜尋
     send: 傳送
-    default: 換行
+    default: "⏎"
 
 fallback_colors:
   candidate_text_color: text_color
@@ -204,15 +206,12 @@ preset_keys:
   Shift_L: {label: ⇧, functional: false, send: Shift_L, shift_lock: ascii_long}
   Return: {label: enter_labels, functional: false, send: Return}
   BackSpace: {label: ⌫, repeatable: true, functional: false, send: BackSpace}
-  space: {repeatable: false, functional: false, label: 空格, send: space}
-  # 英文頁專用：ascii 模式下 Key 層 label 會被忽略、只吃 Event(preset) 的 label，
-  # 所以英文頁要顯示 space 必須另開一個 preset key
-  space_en: {repeatable: false, functional: false, label: space, send: space}
+  space: {repeatable: false, functional: false, label: ' ', send: space}
   Keyboard_zhuyin: {label: 注音, functional: false, send: Eisu_toggle, select: zhuyin}
   Keyboard_english: {label: "🌐", functional: false, send: Eisu_toggle, select: english}
   Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
   Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: symbol}
-  Mic_placeholder: {label: 聲, functional: false, send: VoidSymbol}
+  Mic_placeholder: {label: "🎙", functional: false, send: VoidSymbol}
 
 preset_keyboards:
   zhuyin:
@@ -281,7 +280,7 @@ preset_keyboards:
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: Keyboard_symbol, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 46}
-      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
+      - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第6排（矮排）：地球（切英文） …… 麥克風（占位）
       - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
@@ -335,8 +334,8 @@ preset_keyboards:
       # 第4排：123 / 符號 / 空白 / Enter
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: Keyboard_symbol, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space_en, width: 46}
-      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
+      - {click: space, width: 46}
+      - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切回注音） …… 麥克風（占位）
       - {click: Keyboard_zhuyin, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
@@ -386,7 +385,12 @@ preset_keyboards:
       # 第4排：注音（切回zhuyin） / 空白 / Enter
       - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 64}
-      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
+      - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+      # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {width: 70, height: 26}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
   symbol:
     name: 符號鍵盤（#+=）
@@ -407,17 +411,17 @@ preset_keyboards:
       - {click: '+', width: 10}
       - {click: '=', width: 10}
 
-      # 第2排：_ \ | ~ < > € £ ¥ •
+      # 第2排：_ — \ | ~ « » ¥ & ·（對齊 iOS zh-TW 第二符號頁）
       - {click: '_', width: 10}
+      - {click: '—', width: 10}
       - {click: '\', width: 10}
       - {click: '|', width: 10}
       - {click: '~', width: 10}
-      - {click: '<', width: 10}
-      - {click: '>', width: 10}
-      - {click: '€', width: 10}
-      - {click: '£', width: 10}
+      - {click: '«', width: 10}
+      - {click: '»', width: 10}
       - {click: '¥', width: 10}
-      - {click: '•', width: 10}
+      - {click: '&', width: 10}
+      - {click: '·', width: 10}
 
       # 第3排：123（回數字頁）／半形 . , ? ! ' ／⌫
       - {click: Keyboard_number, width: 14.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
@@ -431,4 +435,9 @@ preset_keyboards:
       # 第4排：注音（切回zhuyin） / 空白 / Enter
       - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 64}
-      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
+      - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+      # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {width: 70, height: 26}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}

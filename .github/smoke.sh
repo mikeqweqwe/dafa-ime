@@ -62,6 +62,16 @@ fi
 
 adb exec-out screencap -p > smoke-keyboard.png || true
 
+# 加拍：符號頁（#+= 在注音頁第5排 x~27%）與深色模式（驗 dark_scheme 自動切換）
+adb shell input tap $((W * 27 / 100)) $((H * 88 / 100)) || true
+sleep 2
+adb exec-out screencap -p > smoke-keyboard-symbol.png || true
+adb shell cmd uimode night yes || true
+sleep 3
+adb exec-out screencap -p > smoke-keyboard-dark.png || true
+adb shell cmd uimode night no || true
+sleep 2
+
 # 收集證據
 adb shell "ls -laR /storage/emulated/0/rime" > smoke-rime-user-dir.txt 2>&1 || true
 adb shell "ls -laR /storage/emulated/0/Android/data/com.tumuyan.trime/files/rime" > smoke-rime-shared-dir.txt 2>&1 || true
@@ -78,8 +88,12 @@ if grep -A2 "FATAL EXCEPTION" smoke-logcat-full.txt | grep -qiE "tumuyan|osfans"
 if grep "Fatal signal" smoke-logcat-full.txt | grep -qi tumuyan; then CRASH=native; fi
 ALIVE=no
 grep -q tumuyan smoke-ps.txt && ALIVE=yes
+# 主題載入失敗會靜默 fallback 到內建主題（鍵盤還在但不是 dafa 樣式），要靠 log 抓
+THEME_OK=yes
+if grep -qE "init\(\) failed|cannot load theme config" smoke-logcat-full.txt; then THEME_OK=no; fi
 {
   echo "IME_SELECTED=$IME_SELECTED"
+  echo "THEME_OK=$THEME_OK"
   echo "DEPLOY_OK=$DEPLOY_OK"
   echo "CRASH=$CRASH"
   echo "PROCESS_ALIVE=$ALIVE"
@@ -88,8 +102,8 @@ grep -q tumuyan smoke-ps.txt && ALIVE=yes
 } | tee smoke-verdict.txt
 
 # 硬指標不過就讓 CI 紅：exit 0 會讓部署失敗/崩潰靜默過關（artifacts 上傳有 if: always() 不受影響）
-if [ "$DEPLOY_OK" = yes ] && [ "$CRASH" = no ] && [ "$ALIVE" = yes ]; then
+if [ "$DEPLOY_OK" = yes ] && [ "$CRASH" = no ] && [ "$ALIVE" = yes ] && [ "$THEME_OK" = yes ]; then
   exit 0
 fi
-echo "SMOKE FAILED: DEPLOY_OK=$DEPLOY_OK CRASH=$CRASH ALIVE=$ALIVE"
+echo "SMOKE FAILED: DEPLOY_OK=$DEPLOY_OK CRASH=$CRASH ALIVE=$ALIVE THEME_OK=$THEME_OK"
 exit 1

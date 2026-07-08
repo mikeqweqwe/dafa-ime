@@ -221,11 +221,13 @@ class AppPrefs(
         var popupKeyPressEnabled: Boolean = false
             get() = prefs.getPref(POPUP_KEY_PRESS_ENABLED, false)
             private set
+        // 預設關：iOS 化——候選列只放候選，schema 狀態列（→英數/全形/繁體）是最大視覺雜訊，
+        // 進階使用者可在設定頁開回
         var switchesEnabled: Boolean = false
-            get() = prefs.getPref(SWITCHES_ENABLED, true)
+            get() = prefs.getPref(SWITCHES_ENABLED, false)
             private set
         var switchArrowEnabled: Boolean = false
-            get() = prefs.getPref(SWITCH_ARROW_ENABLED, true)
+            get() = prefs.getPref(SWITCH_ARROW_ENABLED, false)
             private set
         var candidatePageSize: String = "0"
             get() = prefs.getPref(CANDIDATE_PAGE_SIZE, "0")
