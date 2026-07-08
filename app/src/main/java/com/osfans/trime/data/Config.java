@@ -206,8 +206,21 @@ public class Config {
       }
     }
     Timber.d(methodName + "Rime.get");
-    Rime.get(context, !isExist); // 覆蓋時不強制部署
+    // build/default.yaml 是 full deploy 的產物；缺失代表 RIME 從未完成部署（或部署中被殺），
+    // 此時不論目錄是否存在都必須 full deploy，否則 schema/主題載入不了
+    final File deployedDefault = new File(sharedDataDir, "build" + File.separator + "default.yaml");
+    Rime.get(context, !isExist || !isValidFile(deployedDefault));
+    if (!isValidFile(deployedDefault)) {
+      // Rime 可能在本次 get 之前已被初始化（get 對已存在的實例不做 full_check）→ 重建一次補部署
+      Timber.w(methodName + "build products missing, force full deploy");
+      Rime.destroy();
+      Rime.get(context, true);
+    }
     Timber.d(methodName + "finish");
+  }
+
+  private static boolean isValidFile(File f) {
+    return f.isFile() && f.length() > 0;
   }
 
   public static String[] getThemeKeys(boolean isUser) {
@@ -330,8 +343,10 @@ public class Config {
 
   // 配色指定音效时自动切换音效效果（不会自动修改设置）。
   public void setSoundFromColor() {
+    // 主題載入失敗時 presetColorSchemes 可能為 null，不能讓建構子在這裡硬崩
+    if (presetColorSchemes == null) return;
     final Map<String, ?> m = (Map<String, ?>) presetColorSchemes.get(colorID);
-    assert m != null;
+    if (m == null) return;
     if (m.containsKey("sound")) {
       String sound = (String) m.get("sound");
       if (!Objects.equals(sound, currentSound)) {
@@ -389,8 +404,13 @@ public class Config {
       initEnterLabels();
       Timber.d("init() finins");
     } catch (Exception e) {
-      e.printStackTrace();
-      setTheme(defaultName);
+      Timber.e(e, "init() failed, themeName=%s schema_id=%s", themeName, schema_id);
+      // fallback 到內建主題只在本次生效、不寫入設定（保住使用者選的主題）；
+      // themeName 已是內建主題就不再重試，避免 setTheme↔init 無限遞歸（曾致 StackOverflow 崩潰）
+      if (!defaultName.equals(themeName)) {
+        themeName = defaultName;
+        init(false);
+      }
     }
   }
 
