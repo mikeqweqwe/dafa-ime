@@ -46,9 +46,11 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import com.osfans.trime.R;
+import com.osfans.trime.core.Rime;
 import com.osfans.trime.data.AppPrefs;
 import com.osfans.trime.data.Config;
 import com.osfans.trime.databinding.KeyboardKeyPreviewBinding;
+import com.osfans.trime.ime.core.Trime;
 import com.osfans.trime.ime.enums.KeyEventType;
 import com.osfans.trime.ime.lifecycle.CoroutineScopeJava;
 import com.osfans.trime.util.LeakGuardHandlerWrapper;
@@ -1644,8 +1646,17 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
         int steps = Math.min(Math.abs(mTrackpadRemainderX) / mTrackpadStepPx, 6);
         if (steps > 0) {
           final boolean right = mTrackpadRemainderX > 0;
-          final int code = right ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
-          for (int i = 0; i < steps; i++) mKeyboardActionListener.onKey(code, 0);
+          if (Rime.isComposing()) {
+            // 組字中直接移 raw caret：方案的 selector 排在 navigator 前，Left/Right
+            // keysym 會被當候選高亮吃掉，caret 不會動（實測）
+            final int len = Rime.RimeGetInput().length();
+            final int pos = Rime.RimeGetCaretPos() + (right ? steps : -steps);
+            Rime.RimeSetCaretPos(Math.max(0, Math.min(len, pos)));
+            Trime.getService().updateComposing();
+          } else {
+            final int code = right ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
+            for (int i = 0; i < steps; i++) mKeyboardActionListener.onKey(code, 0);
+          }
           mTrackpadRemainderX -= (right ? 1 : -1) * steps * mTrackpadStepPx;
         }
       } else if (action == MotionEvent.ACTION_UP
