@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.14"
+config_version: "3.15"
 name: dafa
 author: Hau Liu
 
@@ -29,7 +29,7 @@ style:
   horizontal: true
   # 間距/高度對齊 iOS 比例（iPhone 鍵 33x42pt、水平 gap 6、行距 11）：
   # 鍵要「瘦高」不要寬扁——gap 大、行距大、總高 290 讓 scale 後鍵高約 41dp
-  horizontal_gap: 7
+  horizontal_gap: 6
   layout:
     position: fixed
     min_length: 4
@@ -212,6 +212,7 @@ preset_keys:
   Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
   Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: symbol}
   Mic_placeholder: {label: "🎙", functional: false, send: VoidSymbol}
+  liquid_keyboard_emoji: {label: "😀", send: function, command: liquid_keyboard, option: emoji}
 
 preset_keyboards:
   zhuyin:
@@ -276,16 +277,16 @@ preset_keyboards:
       - {label: 'ㄥ', click: '/', width: 8.5}
       - {click: BackSpace, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
-      # 第5排：123 / 符號 / 空白 / Enter（iOS 式：功能鍵灰、Return 藍）
+      # 第5排：123 / 😀 / 空白（注 hint） / Enter——對齊 iOS 底排；#+= 走 123 進符號頁
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: Keyboard_symbol, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 46}
+      - {click: liquid_keyboard_emoji, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space, width: 46, hint: "注", key_hint_offset_x: 55, key_hint_offset_y: -3, key_symbol_color: comment_text_color, hilited_key_symbol_color: hilited_comment_text_color}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第6排（矮排）：地球（切英文） …… 麥克風（占位）
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
 
   english:
     name: 英文鍵盤（收合）
@@ -333,14 +334,14 @@ preset_keyboards:
 
       # 第4排：123 / 符號 / 空白 / Enter
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: Keyboard_symbol, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: liquid_keyboard_emoji, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 46}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切回注音） …… 麥克風（占位）
-      - {click: Keyboard_zhuyin, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_zhuyin, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
 
   number:
     name: 數字符號鍵盤
@@ -388,9 +389,9 @@ preset_keyboards:
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
 
   symbol:
     name: 符號鍵盤（#+=）
@@ -438,6 +439,25 @@ preset_keyboards:
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+
+# emoji 面板（liquid keyboard）：底排 😀 鍵開啟，「返回」tab 回主鍵盤
+liquid_keyboard:
+  author: "Hau Liu"
+  row: 6
+  row_land: 5
+  key_height: 40
+  key_height_land: 40
+  single_width: 60
+  vertical_gap: 1
+  margin_x: 0.5
+  keyboards: [emoji, exit]
+  exit:
+    name: 返回
+    type: NO_KEY
+    keys: EXIT
+  emoji:
+    type: SINGLE
+    keys: "😀😃😄😁😆😅😂🤣🙂🙃😉😊😇😍😘😗😙😚😋😛😜😝🤑🤗🤔🤐😐😑😶😏😒🙄😬😌😔😪😴😷🤒🤕😵😎🤓😕😟🙁☹😮😯😲😳😦😧😨😰😥😢😭😱😖😣😞😓😩😫😤😡😠👍👎👌✌☝🙏🤘👏💪❤💔♡🌹🌸☘🍀☕🍵🍺🍻🍦🍬🍚🍜🍲🍖🎂🎉🔥💯💤💣"
