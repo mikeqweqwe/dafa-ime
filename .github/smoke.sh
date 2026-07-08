@@ -1,40 +1,45 @@
 #!/usr/bin/env bash
-# 模擬器冒煙測試：驗證 dafa.13 崩潰修復
-# 硬指標：(1) 首啟動 full deploy 編出 build/default.yaml (2) 無 StackOverflow/FATAL (3) 進程存活
+# 模擬器冒煙測試：驗證鍵盤崩潰修復
+# 硬指標：(1) 鍵盤召喚後 full deploy 編出 /sdcard/rime/build/default.yaml
+#         (2) 無 StackOverflow/FATAL (3) 進程存活
+# 注意：RIME build 產物在 userDataDir=/sdcard/rime，assets 在 app 外部目錄，兩者不同！
+# 開 App 只會進設定精靈、不觸發 RIME 初始化；必須聚焦輸入框叫出鍵盤。
 set -x
 
 adb root || true
 sleep 3
 adb install app/build/outputs/apk/debug/*-debug.apk
+adb shell pm grant com.tumuyan.trime android.permission.READ_EXTERNAL_STORAGE || true
+adb shell pm grant com.tumuyan.trime android.permission.WRITE_EXTERNAL_STORAGE || true
 adb logcat -c || true
 adb shell ime enable com.tumuyan.trime/com.osfans.trime.TrimeImeService
 adb shell ime set com.tumuyan.trime/com.osfans.trime.TrimeImeService
 adb shell settings put secure show_ime_with_hard_keyboard 1
 
-# 直接開大發 App：走與鍵盤相同的 Config.get→prepareRime→full deploy 初始化路徑
-adb shell monkey -p com.tumuyan.trime -c android.intent.category.LAUNCHER 1
+# 開簡訊 app 並點輸入框 → 召喚鍵盤 → TrimeImeService onCreate → Config.get → full deploy
+adb shell am start -a android.intent.action.SENDTO -d sms:5551234 || true
+sleep 10
+W=$(adb shell wm size | grep -oE '[0-9]+x[0-9]+' | cut -dx -f1)
+H=$(adb shell wm size | grep -oE '[0-9]+x[0-9]+' | cut -dx -f2)
+adb shell input tap $((W * 45 / 100)) $((H * 94 / 100)) || true
+sleep 5
 
-# 等 RIME full deploy 編譯 build/（大詞庫可能要數十秒），輪詢 build/default.yaml
-RIME_DIR=/storage/emulated/0/Android/data/com.tumuyan.trime/files/rime
+# 等 RIME full deploy 編譯 build/（首次叫鍵盤時同步進行），輪詢 user 目錄的 build
+BUILD_FILE=/storage/emulated/0/rime/build/default.yaml
 DEPLOY_OK=no
-for i in $(seq 1 36); do
+for i in $(seq 1 24); do
   sleep 5
-  if adb shell "test -s $RIME_DIR/build/default.yaml && echo BUILD_OK" | grep -q BUILD_OK; then
+  if adb shell "test -s $BUILD_FILE && echo BUILD_OK" | grep -q BUILD_OK; then
     DEPLOY_OK=yes
     break
   fi
 done
 
-# 叫出鍵盤：開訊息輸入框（best effort，截圖用）
-adb shell am start -a android.intent.action.SENDTO -d sms:5551234 || true
-sleep 8
-adb exec-out screencap -p > smoke-sms.png || true
-adb shell input tap 540 1650 || true
-sleep 10
 adb exec-out screencap -p > smoke-keyboard.png || true
 
 # 收集證據
-adb shell "ls -laR $RIME_DIR" > smoke-rime-dir.txt 2>&1 || true
+adb shell "ls -laR /storage/emulated/0/rime" > smoke-rime-user-dir.txt 2>&1 || true
+adb shell "ls -laR /storage/emulated/0/Android/data/com.tumuyan.trime/files/rime" > smoke-rime-shared-dir.txt 2>&1 || true
 adb shell "ps -A | grep -i tumuyan" > smoke-ps.txt 2>&1 || true
 adb shell dumpsys input_method > smoke-ime-dump.txt 2>&1 || true
 adb logcat -d > smoke-logcat-full.txt 2>&1 || true
@@ -51,7 +56,7 @@ adb shell "ps -A | grep -i tumuyan" | grep -q tumuyan && ALIVE=yes
   echo "CRASH=$CRASH"
   echo "PROCESS_ALIVE=$ALIVE"
   echo "BUILD_DIR_LISTING:"
-  adb shell "ls -la $RIME_DIR/build" 2>&1 || true
+  adb shell "ls -la /storage/emulated/0/rime/build" 2>&1 || true
 } > smoke-verdict.txt
 cat smoke-verdict.txt
 exit 0

@@ -207,8 +207,9 @@ public class Config {
     }
     Timber.d(methodName + "Rime.get");
     // build/default.yaml 是 full deploy 的產物；缺失代表 RIME 從未完成部署（或部署中被殺），
-    // 此時不論目錄是否存在都必須 full deploy，否則 schema/主題載入不了
-    final File deployedDefault = new File(sharedDataDir, "build" + File.separator + "default.yaml");
+    // 此時不論目錄是否存在都必須 full deploy，否則 schema/主題載入不了。
+    // 注意：librime 把 build 產物寫在 userDataDir（實機為 /sdcard/rime），不是 sharedDataDir
+    final File deployedDefault = new File(userDataDir, "build" + File.separator + "default.yaml");
     Rime.get(context, !isExist || !isValidFile(deployedDefault));
     if (!isValidFile(deployedDefault)) {
       // Rime 可能在本次 get 之前已被初始化（get 對已存在的實例不做 full_check）→ 重建一次補部署
