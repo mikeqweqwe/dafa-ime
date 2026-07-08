@@ -57,7 +57,7 @@ style:
   key_long_text_size: 16
   key_text_size: 22
   key_width: 10.0
-  keyboards: [zhuyin, english, number]
+  keyboards: [zhuyin, english, number, symbol]
   label_text_size: 20
   label_font: label.ttf
   latin_font: latin.ttf
@@ -88,7 +88,7 @@ style:
     pre: 上個
     search: 搜尋
     send: 傳送
-    default: 完成
+    default: 換行
 
 fallback_colors:
   candidate_text_color: text_color
@@ -126,17 +126,21 @@ fallback_colors:
   text_back_color: back_color
   long_text_back_color: key_back_color
 
+# 色彩對齊 iOS：鍵帽白/功能鍵 #ABB0BA/藍 #007AFF；深色版用 iOS 深色系 #0A84FF。
+# return_key_*/function_key_* 是自訂色名，供 preset_keyboards 單鍵 override 引用
+# （引用色名而非寫死色值，深淺色切換才會跟著變）
 preset_color_schemes:
   dafa_light:
     name: "大發／淺色"
     author: Hau Liu
+    dark_scheme: dafa_dark
     back_color: 0xffe8e9eb
     border_color: 0xffe8e9eb
     candidate_text_color: 0xff1c1c1e
     comment_text_color: 0xff8e8e93
     hilited_back_color: 0xffffffff
     hilited_candidate_back_color: 0xffffffff
-    hilited_candidate_text_color: 0xff0e9b8e
+    hilited_candidate_text_color: 0xff007aff
     hilited_comment_text_color: 0xff1c1c1e
     hilited_key_back_color: 0xffb8bcc4
     hilited_key_symbol_color: 0xff1c1c1e
@@ -149,22 +153,65 @@ preset_color_schemes:
     key_text_color: 0xff1c1c1e
     keyboard_back_color: 0xffe8e9eb
     label_color: 0xff1c1c1e
-    off_key_back_color: 0xffaeb2ba
+    off_key_back_color: 0xffabb0ba
     off_key_text_color: 0xff1c1c1e
     preview_back_color: 0xffffffff
     preview_text_color: 0xff1c1c1e
-    text_color: 0xff0e9b8e
+    text_color: 0xff007aff
     text_back_color: 0xffffffff
+    return_key_back_color: 0xff007aff
+    return_key_text_color: 0xffffffff
+    return_key_hilited_back_color: 0xff0063cc
+    function_key_back_color: 0xffabb0ba
+    function_key_hilited_back_color: 0xffffffff
+
+  dafa_dark:
+    name: "大發／深色"
+    author: Hau Liu
+    light_scheme: dafa_light
+    back_color: 0xff1c1c1e
+    border_color: 0xff1c1c1e
+    candidate_text_color: 0xffffffff
+    comment_text_color: 0xff98989e
+    hilited_back_color: 0xff2c2c2e
+    hilited_candidate_back_color: 0xff2c2c2e
+    hilited_candidate_text_color: 0xff0a84ff
+    hilited_comment_text_color: 0xffffffff
+    hilited_key_back_color: 0xff8e8e93
+    hilited_key_symbol_color: 0xffffffff
+    hilited_key_text_color: 0xffffffff
+    hilited_off_key_back_color: 0xff6b6b6f
+    hilited_off_key_text_color: 0xffffffff
+    hilited_text_color: 0xffffffff
+    key_back_color: 0xff6b6b6f
+    key_symbol_color: 0xffffffff
+    key_text_color: 0xffffffff
+    keyboard_back_color: 0xff1c1c1e
+    label_color: 0xffffffff
+    off_key_back_color: 0xff464649
+    off_key_text_color: 0xffffffff
+    preview_back_color: 0xff6b6b6f
+    preview_text_color: 0xffffffff
+    text_color: 0xff0a84ff
+    text_back_color: 0xff1c1c1e
+    return_key_back_color: 0xff0a84ff
+    return_key_text_color: 0xffffffff
+    return_key_hilited_back_color: 0xff0774de
+    function_key_back_color: 0xff464649
+    function_key_hilited_back_color: 0xff6b6b6f
 
 preset_keys:
   Shift_L: {label: ⇧, functional: false, send: Shift_L, shift_lock: ascii_long}
   Return: {label: enter_labels, functional: false, send: Return}
   BackSpace: {label: ⌫, repeatable: true, functional: false, send: BackSpace}
-  space: {repeatable: false, functional: false, label: ' ', send: space}
+  space: {repeatable: false, functional: false, label: 空格, send: space}
+  # 英文頁專用：ascii 模式下 Key 層 label 會被忽略、只吃 Event(preset) 的 label，
+  # 所以英文頁要顯示 space 必須另開一個 preset key
+  space_en: {repeatable: false, functional: false, label: space, send: space}
   Keyboard_zhuyin: {label: 注音, functional: false, send: Eisu_toggle, select: zhuyin}
   Keyboard_english: {label: "🌐", functional: false, send: Eisu_toggle, select: english}
   Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
-  Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: number}
+  Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: symbol}
   Mic_placeholder: {label: 聲, functional: false, send: VoidSymbol}
 
 preset_keyboards:
@@ -228,18 +275,18 @@ preset_keyboards:
       - {label: 'ㄝ', click: ',', width: 8.5}
       - {label: 'ㄡ', click: '.', width: 8.5}
       - {label: 'ㄥ', click: '/', width: 8.5}
-      - {click: BackSpace, width: 15}
+      - {click: BackSpace, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
-      # 第5排：123 / 符號 / 空白 / Enter
-      - {click: Keyboard_number, width: 18}
-      - {click: Keyboard_symbol, width: 18}
+      # 第5排：123 / 符號 / 空白 / Enter（iOS 式：功能鍵灰、Return 藍）
+      - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_symbol, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 46}
-      - {click: Return, width: 18}
+      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
 
       # 第6排（矮排）：地球（切英文） …… 麥克風（占位）
-      - {click: Keyboard_english, height: 26, width: 15}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
   english:
     name: 英文鍵盤（收合）
@@ -275,7 +322,7 @@ preset_keyboards:
       - {width: 5}
 
       # 第3排：⇧ + ZXCVBNM + ⌫
-      - {click: Shift_L, width: 15}
+      - {click: Shift_L, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: z, width: 10}
       - {click: x, width: 10}
       - {click: c, width: 10}
@@ -283,18 +330,18 @@ preset_keyboards:
       - {click: b, width: 10}
       - {click: n, width: 10}
       - {click: m, width: 10}
-      - {click: BackSpace, width: 15}
+      - {click: BackSpace, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第4排：123 / 符號 / 空白 / Enter
-      - {click: Keyboard_number, width: 18}
-      - {click: Keyboard_symbol, width: 18}
-      - {click: space, width: 46}
-      - {click: Return, width: 18}
+      - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_symbol, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space_en, width: 46}
+      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
 
       # 第5排（矮排）：地球（切回注音） …… 麥克風（占位）
-      - {click: Keyboard_zhuyin, height: 26, width: 15}
+      - {click: Keyboard_zhuyin, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
   number:
     name: 數字符號鍵盤
@@ -327,16 +374,61 @@ preset_keyboards:
       - {click: '＠', width: 10}
       - {click: '「」', width: 10}
 
-      # 第3排：#+=（占位切回本頁）／。／，／？／！／、／⌫
-      - {click: Keyboard_symbol, width: 14.3}
+      # 第3排：#+=（進符號頁）／。／，／？／！／、／⌫
+      - {click: Keyboard_symbol, width: 14.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: '。', width: 14.3}
       - {click: '，', width: 14.3}
       - {click: '？', width: 14.3}
       - {click: '！', width: 14.3}
       - {click: '、', width: 14.3}
-      - {click: BackSpace, width: 14.2}
+      - {click: BackSpace, width: 14.2, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第4排：注音（切回zhuyin） / 空白 / Enter
-      - {click: Keyboard_zhuyin, width: 18}
+      - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 64}
-      - {click: Return, width: 18}
+      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
+
+  symbol:
+    name: 符號鍵盤（#+=）
+    author: Hau Liu
+    ascii_mode: 1
+    width: 10
+    height: 48
+    keys:
+      # 第1排：[ ] { } # % ^ * + =（半形，iOS 第二符號頁）
+      - {click: '[', width: 10}
+      - {click: ']', width: 10}
+      - {click: '{', width: 10}
+      - {click: '}', width: 10}
+      - {click: '#', width: 10}
+      - {click: '%', width: 10}
+      - {click: '^', width: 10}
+      - {click: '*', width: 10}
+      - {click: '+', width: 10}
+      - {click: '=', width: 10}
+
+      # 第2排：_ \ | ~ < > € £ ¥ •
+      - {click: '_', width: 10}
+      - {click: '\', width: 10}
+      - {click: '|', width: 10}
+      - {click: '~', width: 10}
+      - {click: '<', width: 10}
+      - {click: '>', width: 10}
+      - {click: '€', width: 10}
+      - {click: '£', width: 10}
+      - {click: '¥', width: 10}
+      - {click: '•', width: 10}
+
+      # 第3排：123（回數字頁）／半形 . , ? ! ' ／⌫
+      - {click: Keyboard_number, width: 14.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '.', width: 14.3}
+      - {click: ',', width: 14.3}
+      - {click: '?', width: 14.3}
+      - {click: '!', width: 14.3}
+      - {click: "'", width: 14.3}
+      - {click: BackSpace, width: 14.2, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+      # 第4排：注音（切回zhuyin） / 空白 / Enter
+      - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space, width: 64}
+      - {click: Return, width: 18, key_back_color: return_key_back_color, key_text_color: return_key_text_color, hilited_key_back_color: return_key_hilited_back_color, hilited_key_text_color: return_key_text_color}
