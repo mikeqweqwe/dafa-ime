@@ -457,19 +457,10 @@ class TextInputManager private constructor() :
                 Rime.toggleOption(index)
                 trime.updateComposing()
             }
-        } else if (prefs.keyboard.hookCandidate || index > 9) {
-            if (Rime.selectCandidate(index)) {
-                if (prefs.keyboard.hookCandidateCommit) {
-                    // todo 找到切换高亮候选词的API，并把此处改为模拟移动候选后发送空格
-                    // 如果使用了lua处理候选上屏，模拟数字键、空格键是非常有必要的
-                    activeEditorInstance.commitRimeText()
-                } else
-                    activeEditorInstance.commitRimeText()
-            }
-        } else if (index == 9) {
-            trime.handleKey(KeyEvent.KEYCODE_0, 0)
-        } else {
-            trime.handleKey(KeyEvent.KEYCODE_1 + index, 0)
+        } else if (Rime.selectCandidate(index)) {
+            // 一律走 librime 直選 API。上游「模擬數字鍵選字」是為拼音方案（數字=select_keys）
+            // 設計的；大千注音的數字是字根（1=ㄅ、3=ˇ、8=ㄚ），模擬數字鍵會把點候選變成打字
+            activeEditorInstance.commitRimeText()
         }
     }
 

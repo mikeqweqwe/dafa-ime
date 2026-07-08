@@ -98,18 +98,8 @@
             android:title="@string/keyboard__hook_fast_input"
             app:iconSpaceReserved="false" />
 
-        <SwitchPreferenceCompat
-            android:key="keyboard__hook_candidate"
-            android:summaryOff="@string/keyboard__hook_candidate_off"
-            android:summaryOn="@string/keyboard__hook_candidate_on"
-            android:title="@string/keyboard__hook_candidate"
-            app:iconSpaceReserved="false" />
-
-        <SwitchPreferenceCompat
-            android:key="keyboard__hook_candidate_commit"
-            android:title="@string/keyboard__hook_candidate_commit"
-            app:iconSpaceReserved="false" />
-
+        <!-- hook_candidate 已移除：點候選一律走 librime 直選 API（見 TextInputManager），
+             注音方案數字是字根，「發送數字鍵選字」的關閉態必然錯字上屏 -->
         <SwitchPreferenceCompat
             android:key="keyboard__hook_ctrl_lr"
             android:title="@string/keyboard__hook_ctrl_lr"
