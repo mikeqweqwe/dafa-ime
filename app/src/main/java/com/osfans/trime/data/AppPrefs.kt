@@ -204,8 +204,10 @@ class AppPrefs(
             const val DELETE_CANDIDATE_TIMEOUT = "keyboard__key_delete_candidate_timeout"
             const val SHOULD_LONG_CLICK_DELETE_CANDIDATE = "keyboard__long_click_delete_candidate"
         }
+        // composition＝組字顯示注音字面＋soft cursor（iOS 超注音式，拖曳游標可見）；
+        // preview 顯示首選中文會讓 trackpad 拖游標時看不到位置
         var inlinePreedit: InlineModeType
-            get() = InlineModeType.fromString(prefs.getPref(INLINE_PREEDIT_MODE, "preview"))
+            get() = InlineModeType.fromString(prefs.getPref(INLINE_PREEDIT_MODE, "composition"))
             set(v) = prefs.setPref(INLINE_PREEDIT_MODE, v)
         var fullscreenMode: LandscapeInputUIMode
             get() = LandscapeInputUIMode.fromString(prefs.getPref(FULLSCREEN_MODE, "auto_show"))

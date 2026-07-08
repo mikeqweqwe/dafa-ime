@@ -1652,7 +1652,8 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
             final int len = Rime.RimeGetInput().length();
             final int pos = Rime.RimeGetCaretPos() + (right ? steps : -steps);
             Rime.RimeSetCaretPos(Math.max(0, Math.min(len, pos)));
-            Trime.getService().updateComposing();
+            final Trime service = Trime.getServiceOrNull();
+            if (service != null) service.updateComposing();
           } else {
             final int code = right ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
             for (int i = 0; i < steps; i++) mKeyboardActionListener.onKey(code, 0);

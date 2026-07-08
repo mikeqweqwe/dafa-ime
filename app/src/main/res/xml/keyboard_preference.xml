@@ -8,7 +8,7 @@
         app:iconSpaceReserved="false"
         app:title="@string/pref_keyboard__function">
         <ListPreference
-            android:defaultValue="preview"
+            android:defaultValue="composition"
             android:entries="@array/keyboard__inline_entries"
             android:entryValues="@array/keyboard__inline_values"
             android:key="keyboard__inline_preedit"
