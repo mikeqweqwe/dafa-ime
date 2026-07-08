@@ -12,8 +12,25 @@ adb install app/build/outputs/apk/debug/*-debug.apk
 adb shell pm grant com.tumuyan.trime android.permission.READ_EXTERNAL_STORAGE || true
 adb shell pm grant com.tumuyan.trime android.permission.WRITE_EXTERNAL_STORAGE || true
 adb logcat -c || true
-adb shell ime enable com.tumuyan.trime/com.osfans.trime.TrimeImeService
-adb shell ime set com.tumuyan.trime/com.osfans.trime.TrimeImeService
+
+# install Success 後系統要幾秒才把 IME 註冊進 InputMethodManager，太早 enable 會
+# 「Unknown input method」整場測試白跑 → 先等註冊、set 完驗證真的選上
+IME_ID=com.tumuyan.trime/com.osfans.trime.TrimeImeService
+for i in $(seq 1 12); do
+  if adb shell ime list -a 2>/dev/null | grep -q com.tumuyan.trime; then break; fi
+  sleep 5
+done
+IME_SELECTED=no
+for i in $(seq 1 6); do
+  adb shell ime enable "$IME_ID" || true
+  adb shell ime set "$IME_ID" || true
+  if adb shell settings get secure default_input_method | grep -q com.tumuyan.trime; then
+    IME_SELECTED=yes
+    break
+  fi
+  sleep 3
+done
+echo "IME_SELECTED=$IME_SELECTED"
 adb shell settings put secure show_ime_with_hard_keyboard 1
 
 # 開簡訊 app 並點輸入框 → 召喚鍵盤 → TrimeImeService onCreate → Config.get → full deploy
@@ -62,6 +79,7 @@ if grep "Fatal signal" smoke-logcat-full.txt | grep -qi tumuyan; then CRASH=nati
 ALIVE=no
 grep -q tumuyan smoke-ps.txt && ALIVE=yes
 {
+  echo "IME_SELECTED=$IME_SELECTED"
   echo "DEPLOY_OK=$DEPLOY_OK"
   echo "CRASH=$CRASH"
   echo "PROCESS_ALIVE=$ALIVE"

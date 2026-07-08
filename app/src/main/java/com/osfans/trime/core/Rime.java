@@ -371,8 +371,8 @@ public class Rime {
   }
 
   /**
-   * 確保 full deploy 產物存在。get 對已存在的實例不做 full_check，這種情況要重建補部署；
-   * 剛部署完就失敗的情況不重試（部署同步佔住啟動路徑，重試只會加倍卡死時間）。 整段上鎖：alive 判斷與 get 之間若被其他執行緒建立實例，會漏掉補部署。
+   * 確保 full deploy 產物存在。get 對已存在的實例不做 full_check，這種情況要重建補部署； 剛部署完就失敗的情況不重試（部署同步佔住啟動路徑，重試只會加倍卡死時間）。
+   * 整段上鎖：alive 判斷與 get 之間若被其他執行緒建立實例，會漏掉補部署。
    */
   public static synchronized void ensureDeployed(
       Context context, boolean needDeploy, File deployedDefault) {
