@@ -34,7 +34,7 @@
         android:icon="@mipmap/ic_app_icon"
         android:roundIcon="@mipmap/ic_app_icon_round"
         android:requestLegacyExternalStorage="true"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:theme="@style/PreferenceTheme">
 
         <service android:name=".TrimeImeService" android:label="@string/trime_app_name"
