@@ -33,11 +33,15 @@ for i in $(seq 1 24); do
     DEPLOY_OK=yes
     break
   fi
-  if adb logcat -d 2>/dev/null | grep -E "StackOverflowError|FATAL EXCEPTION|Fatal signal" | grep -qi tumuyan; then
+  if adb logcat -d 2>/dev/null | grep -A2 -E "StackOverflowError|FATAL EXCEPTION|Fatal signal" | grep -qi tumuyan; then
     break
   fi
   sleep 5
 done
+# 補最後一次檢查：build 若在最後一輪 sleep 期間才出現，別誤判 no
+if [ "$DEPLOY_OK" = no ] && adb shell "test -s $BUILD_FILE && echo BUILD_OK" | grep -q BUILD_OK; then
+  DEPLOY_OK=yes
+fi
 
 adb exec-out screencap -p > smoke-keyboard.png || true
 
