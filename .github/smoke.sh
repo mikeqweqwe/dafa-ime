@@ -44,13 +44,15 @@ sleep 5
 
 # 等 RIME full deploy 編譯 build/（首次叫鍵盤時同步進行）；先查後睡，崩潰就早退
 BUILD_FILE=/storage/emulated/0/Android/data/com.tumuyan.trime/files/rime/build/default.yaml
+# 本 app 的 log 特徵：process 名 tumuyan、stack frame 是 osfans
+APP_RE="tumuyan|osfans"
 DEPLOY_OK=no
 for i in $(seq 1 24); do
   if adb shell "test -s $BUILD_FILE && echo BUILD_OK" | grep -q BUILD_OK; then
     DEPLOY_OK=yes
     break
   fi
-  if adb logcat -d 2>/dev/null | grep -A2 -E "StackOverflowError|FATAL EXCEPTION|Fatal signal" | grep -qiE "tumuyan|osfans"; then
+  if adb logcat -d 2>/dev/null | grep -A2 -E "StackOverflowError|FATAL EXCEPTION|Fatal signal" | grep -qiE "$APP_RE"; then
     break
   fi
   sleep 5
@@ -85,9 +87,9 @@ grep -iE "tumuyan|TrimeIme|AndroidRuntime|FATAL|StackOverflow|Fatal signal|Rime|
 # 硬指標判定（含 native crash）
 CRASH=no
 # 都 scope 到本 app（process=tumuyan、stack frame=osfans），別讓系統其他 process 的崩潰誤紅
-if grep -A2 "StackOverflowError" smoke-logcat-full.txt | grep -qiE "tumuyan|osfans"; then CRASH=stackoverflow; fi
-if grep -A2 "FATAL EXCEPTION" smoke-logcat-full.txt | grep -qiE "tumuyan|osfans"; then CRASH=fatal; fi
-if grep "Fatal signal" smoke-logcat-full.txt | grep -qi tumuyan; then CRASH=native; fi
+if grep -A2 "StackOverflowError" smoke-logcat-full.txt | grep -qiE "$APP_RE"; then CRASH=stackoverflow; fi
+if grep -A2 "FATAL EXCEPTION" smoke-logcat-full.txt | grep -qiE "$APP_RE"; then CRASH=fatal; fi
+if grep "Fatal signal" smoke-logcat-full.txt | grep -qiE "$APP_RE"; then CRASH=native; fi
 ALIVE=no
 grep -q tumuyan smoke-ps.txt && ALIVE=yes
 # 主題載入失敗會靜默 fallback 到內建主題（鍵盤還在但不是 dafa 樣式），要靠 log 抓

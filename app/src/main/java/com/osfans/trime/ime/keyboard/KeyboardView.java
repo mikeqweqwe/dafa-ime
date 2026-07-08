@@ -933,7 +933,9 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
           Timber.e(ex, "Get Drawable Exception");
         }
       }
-      final boolean isEnterKey = "enter_labels".equals(key.getLabel());
+      String label = key.getLabel();
+      final boolean isEnterKey = "enter_labels".equals(label);
+      if (isEnterKey) label = labelEnter;
       if (isEnterKey && enterActionAvailable && enterActionBackground != null) {
         keyBackground =
             key.isPressed() && enterActionHilitedBackground != null
@@ -956,9 +958,6 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
       mPaintSymbol.setColor(
           color != null ? color : (key.isPressed() ? hilited_key_symbol_color : key_symbol_color));
 
-      // Switch the character to uppercase if shift is pressed
-      String label = key.getLabel();
-      if (label.equals("enter_labels")) label = labelEnter;
       final String hint = key.getHint();
       int left = (key.getWidth() - padding.left - padding.right) / 2 + padding.left;
       int top = padding.top;

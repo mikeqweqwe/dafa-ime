@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.osfans.trime.data.AppPrefs;
+import com.osfans.trime.data.Config;
 import com.osfans.trime.data.DataManager;
 import com.osfans.trime.data.opencc.OpenCCDictManager;
 import com.osfans.trime.ime.core.Trime;
@@ -378,7 +379,7 @@ public class Rime {
       Context context, boolean needDeploy, File deployedDefault) {
     final boolean alreadyAlive = self != null;
     get(context, needDeploy);
-    if (needDeploy && alreadyAlive && !(deployedDefault.isFile() && deployedDefault.length() > 0)) {
+    if (needDeploy && alreadyAlive && !Config.isValidFile(deployedDefault)) {
       Timber.w("build products missing, rebuild Rime to force full deploy");
       destroy();
       get(context, true);
@@ -676,9 +677,11 @@ public class Rime {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       handleRimeEvent(event, message_value);
     } else {
-      new Handler(Looper.getMainLooper()).post(() -> handleRimeEvent(event, message_value));
+      sMainHandler.post(() -> handleRimeEvent(event, message_value));
     }
   }
+
+  private static final Handler sMainHandler = new Handler(Looper.getMainLooper());
 
   private static void handleRimeEvent(RimeEvent event, String message_value) {
     // self 要 init 完整跑完才賦值：null 代表 Rime 正在重建（destroy+get 部署中）或已銷毀，

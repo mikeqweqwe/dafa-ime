@@ -226,7 +226,7 @@ public class Config {
     Timber.d(methodName + "finish");
   }
 
-  private static boolean isValidFile(File f) {
+  public static boolean isValidFile(File f) {
     return f.isFile() && f.length() > 0;
   }
 
