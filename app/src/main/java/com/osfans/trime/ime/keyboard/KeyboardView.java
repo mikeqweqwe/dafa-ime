@@ -243,14 +243,26 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
   private String labelEnter = "";
   private Map<String, String> mEnterLabels;
   private int enterLabelMode;
+  // iOS 式 Return：輸入框有明確動作（前往/搜尋…）時鍵帽變藍，否則維持灰 ⏎
+  private boolean enterActionAvailable = false;
+  private Drawable enterActionBackground, enterActionHilitedBackground;
+  private Integer enterActionTextColor;
+  // iOS 式鍵帽底部投影（key_shadow_color 未定義時不畫）
+  private GradientDrawable mKeyShadow;
+  private int mKeyShadowOffset;
 
   public void resetEnterLabel() {
     labelEnter = mEnterLabels.get("default");
+    enterActionAvailable = false;
   }
 
   public void setEnterLabel(int action, CharSequence actionLabel) {
     // enter_label_mode 取值：
     // 0不使用，1只使用actionlabel，2优先使用，3当其他方式没有获得label时才读取actionlabel
+    enterActionAvailable =
+        (actionLabel != null && actionLabel.length() > 0)
+            || (action != EditorInfo.IME_ACTION_NONE
+                && action != EditorInfo.IME_ACTION_UNSPECIFIED);
 
     if (enterLabelMode == 1) {
       if (actionLabel != null && actionLabel.length() > 0) labelEnter = actionLabel.toString();
@@ -286,6 +298,8 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
         break;
       case EditorInfo.IME_ACTION_NONE:
         labelEnter = mEnterLabels.get("none");
+        if (labelEnter == null) labelEnter = mEnterLabels.get("default");
+        break;
       default:
         if (enterLabelMode == 3) {
           if (actionLabel != null && actionLabel.length() > 0) {
@@ -383,6 +397,20 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
               config.getColor("hilited_key_text_color"),
               config.getColor("key_text_color")
             });
+
+    enterActionBackground = config.getColorDrawable("return_key_back_color");
+    enterActionHilitedBackground = config.getColorDrawable("return_key_hilited_back_color");
+    enterActionTextColor = config.getColor("return_key_text_color");
+
+    final Integer keyShadowColor = config.getColor("key_shadow_color");
+    if (keyShadowColor != null) {
+      mKeyShadow = new GradientDrawable();
+      mKeyShadow.setColor(keyShadowColor);
+      mKeyShadowOffset = (int) (getResources().getDisplayMetrics().density + 0.5f); // 1dp
+    } else {
+      mKeyShadow = null;
+      mKeyShadowOffset = 0;
+    }
 
     final Integer color = config.getColor("preview_text_color");
     if (color != null) mPreviewText.setTextColor(color);
@@ -877,7 +905,8 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
       if (invalidKey.getX() + kbdPaddingLeft - 1 <= clipRegion.left
           && invalidKey.getY() + kbdPaddingTop - 1 <= clipRegion.top
           && invalidKey.getX() + invalidKey.getWidth() + kbdPaddingLeft + 1 >= clipRegion.right
-          && invalidKey.getY() + invalidKey.getHeight() + kbdPaddingTop + 1 >= clipRegion.bottom) {
+          && invalidKey.getY() + invalidKey.getHeight() + kbdPaddingTop + 1 + mKeyShadowOffset
+              >= clipRegion.bottom) {
         drawSingleKey = true;
       }
     }
@@ -904,6 +933,13 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
           Timber.e(ex, "Get Drawable Exception");
         }
       }
+      final boolean isEnterKey = "enter_labels".equals(key.getLabel());
+      if (isEnterKey && enterActionAvailable && enterActionBackground != null) {
+        keyBackground =
+            key.isPressed() && enterActionHilitedBackground != null
+                ? enterActionHilitedBackground
+                : enterActionBackground;
+      }
       if (keyBackground instanceof GradientDrawable) {
         ((GradientDrawable) keyBackground)
             .setCornerRadius(
@@ -912,6 +948,9 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
                     : mKeyboard.getRoundCorner());
       }
       Integer color = key.getTextColorForState(drawableState);
+      if (isEnterKey && enterActionAvailable && enterActionTextColor != null) {
+        color = enterActionTextColor;
+      }
       mPaint.setColor(color != null ? color : mKeyTextColor.getColorForState(drawableState, 0));
       color = key.getSymbolColorForState(drawableState);
       mPaintSymbol.setColor(
@@ -929,6 +968,16 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
         keyBackground.setBounds(0, 0, key.getWidth(), key.getHeight());
       }
       canvas.translate(key.getX() + kbdPaddingLeft, key.getY() + kbdPaddingTop);
+      if (mKeyShadow != null && key.hasKeyShadow()) {
+        // 影子下移 1dp、被鍵帽蓋住，只露出底部一條（iOS 鍵帽立體感）
+        mKeyShadow.setCornerRadius(
+            key.getRound_corner() != null && key.getRound_corner() > 0
+                ? key.getRound_corner()
+                : mKeyboard.getRoundCorner());
+        mKeyShadow.setBounds(
+            0, mKeyShadowOffset, key.getWidth(), key.getHeight() + mKeyShadowOffset);
+        mKeyShadow.draw(canvas);
+      }
       keyBackground.draw(canvas);
 
       if (!TextUtils.isEmpty(label)) {
@@ -1128,13 +1177,16 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     // If key changed and preview is on ...
     if (oldKeyIndex != mCurrentKeyIndex && mShowPreview) {
       mHandler.removeMessages(MSG_SHOW_PREVIEW);
+      // iOS 式：只有字元鍵彈泡泡，功能鍵（空白/⏎/⌫/⇧/切換鍵）不彈
+      final boolean previewable =
+          keyIndex != NOT_A_KEY && keys.length > keyIndex && keys[keyIndex].isPreviewable();
       if (previewPopup.isShowing()) {
-        if (keyIndex == NOT_A_KEY) {
+        if (!previewable) {
           mHandler.sendMessageDelayed(
               mHandler.obtainMessage(MSG_REMOVE_PREVIEW), DELAY_AFTER_PREVIEW);
         }
       }
-      if (keyIndex != NOT_A_KEY) {
+      if (previewable) {
         if (previewPopup.isShowing() && mPreviewText.getVisibility() == VISIBLE) {
           // Show right away, if it's already visible and finger is moving around
           showKey(keyIndex, type);
@@ -1247,18 +1299,19 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     }
     final Key key = mKeys[keyIndex];
     mInvalidatedKey = key;
+    // 鍵帽投影多畫 mKeyShadowOffset，重繪範圍要涵蓋，否則殘影
     mDirtyRect.union(
         key.getX() + getPaddingLeft(),
         key.getY() + getPaddingTop(),
         key.getX() + key.getWidth() + getPaddingLeft(),
-        key.getY() + key.getHeight() + getPaddingTop());
+        key.getY() + key.getHeight() + getPaddingTop() + mKeyShadowOffset);
     onBufferDraw();
     Timber.d("\t<TrimeInput>\tinvalidateKey()\tinvalidate");
     invalidate(
         key.getX() + getPaddingLeft(),
         key.getY() + getPaddingTop(),
         key.getX() + key.getWidth() + getPaddingLeft(),
-        key.getY() + key.getHeight() + getPaddingTop());
+        key.getY() + key.getHeight() + getPaddingTop() + mKeyShadowOffset);
     Timber.d("\t<TrimeInput>\tinvalidateKey()\tfinish");
   }
 
@@ -1269,7 +1322,7 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
           key.getX() + getPaddingLeft(),
           key.getY() + getPaddingTop(),
           key.getX() + key.getWidth() + getPaddingLeft(),
-          key.getY() + key.getHeight() + getPaddingTop());
+          key.getY() + key.getHeight() + getPaddingTop() + mKeyShadowOffset);
     }
     onBufferDraw();
     invalidate();

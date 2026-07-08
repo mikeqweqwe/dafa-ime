@@ -24,7 +24,7 @@
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="keyboard__show_key_popup"
             android:title="@string/keyboard__show_key_popup_title"
             app:iconSpaceReserved="false" />

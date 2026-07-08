@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.15"
+config_version: "3.16"
 name: dafa
 author: Hau Liu
 
@@ -59,7 +59,7 @@ style:
   key_long_text_size: 16
   key_text_size: 20
   key_width: 10.0
-  keyboards: [zhuyin, english, number, symbol]
+  keyboards: [zhuyin, english, number, symbol, numpad, phonepad]
   label_text_size: 20
   label_font: label.ttf
   latin_font: latin.ttf
@@ -69,10 +69,10 @@ style:
   keyboard_height_land: 200
   preview_font: latin.ttf
   preview_height: 56
-  preview_offset: -32
+  preview_offset: -12
   preview_text_size: 40
   proximity_correction: true
-  reset_ascii_mode: false
+  reset_ascii_mode: true
   round_corner: 9
   shadow_radius: 0.0
   speech_opencc_config: none
@@ -166,6 +166,7 @@ preset_color_schemes:
     return_key_hilited_back_color: 0xff0063cc
     function_key_back_color: 0xffabb0ba
     function_key_hilited_back_color: 0xffffffff
+    key_shadow_color: 0xff898a8d
 
   dafa_dark:
     name: "大發／深色"
@@ -201,6 +202,7 @@ preset_color_schemes:
     return_key_hilited_back_color: 0xff0774de
     function_key_back_color: 0xff464649
     function_key_hilited_back_color: 0xff6b6b6f
+    key_shadow_color: 0x59000000
 
 preset_keys:
   Shift_L: {label: ⇧, functional: false, send: Shift_L, shift_lock: ascii_long}
@@ -280,13 +282,13 @@ preset_keyboards:
       # 第5排：123 / 😀 / 空白（注 hint） / Enter——對齊 iOS 底排；#+= 走 123 進符號頁
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: liquid_keyboard_emoji, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 46, hint: "注", key_hint_offset_x: 55, key_hint_offset_y: -3, key_symbol_color: comment_text_color, hilited_key_symbol_color: hilited_comment_text_color}
+      - {click: space, width: 46, swipe_left: Left, swipe_right: Right, hint: "注", key_hint_offset_x: 55, key_hint_offset_y: -3, key_symbol_color: comment_text_color, hilited_key_symbol_color: hilited_comment_text_color}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第6排（矮排）：地球（切英文） …… 麥克風（占位）
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
 
   english:
     name: 英文鍵盤（收合）
@@ -335,13 +337,13 @@ preset_keyboards:
       # 第4排：123 / 符號 / 空白 / Enter
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: liquid_keyboard_emoji, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 46}
+      - {click: space, width: 46, swipe_left: Left, swipe_right: Right}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切回注音） …… 麥克風（占位）
-      - {click: Keyboard_zhuyin, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Keyboard_zhuyin, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
 
   number:
     name: 數字符號鍵盤
@@ -385,13 +387,13 @@ preset_keyboards:
 
       # 第4排：注音（切回zhuyin） / 空白 / Enter
       - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 64}
+      - {click: space, width: 64, swipe_left: Left, swipe_right: Right}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
 
   symbol:
     name: 符號鍵盤（#+=）
@@ -435,13 +437,55 @@ preset_keyboards:
 
       # 第4排：注音（切回zhuyin） / 空白 / Enter
       - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 64}
+      - {click: space, width: 64, swipe_left: Left, swipe_right: Right}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
       - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
+
+  # 純數字欄位（TYPE_CLASS_NUMBER/DATETIME 由 TextInputManager 自動切入）——iOS numberPad 3x4
+  numpad:
+    name: 數字九宮格
+    author: Hau Liu
+    ascii_mode: 1
+    width: 10
+    height: 52
+    keys:
+      - {click: '1', width: 33.3}
+      - {click: '2', width: 33.4}
+      - {click: '3', width: 33.3}
+      - {click: '4', width: 33.3}
+      - {click: '5', width: 33.4}
+      - {click: '6', width: 33.3}
+      - {click: '7', width: 33.3}
+      - {click: '8', width: 33.4}
+      - {click: '9', width: 33.3}
+      - {click: '.', width: 33.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '0', width: 33.4}
+      - {click: BackSpace, width: 33.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+  # 電話欄位（TYPE_CLASS_PHONE）——iOS phonePad：第4排 +*#（長按 * ）
+  phonepad:
+    name: 電話九宮格
+    author: Hau Liu
+    ascii_mode: 1
+    width: 10
+    height: 52
+    keys:
+      - {click: '1', width: 33.3}
+      - {click: '2', width: 33.4}
+      - {click: '3', width: 33.3}
+      - {click: '4', width: 33.3}
+      - {click: '5', width: 33.4}
+      - {click: '6', width: 33.3}
+      - {click: '7', width: 33.3}
+      - {click: '8', width: 33.4}
+      - {click: '9', width: 33.3}
+      - {label: '+＊#', click: '+', long_click: '*', swipe_up: '#', width: 33.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '0', width: 33.4}
+      - {click: BackSpace, width: 33.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
 # emoji 面板（liquid keyboard）：底排 😀 鍵開啟，「返回」tab 回主鍵盤
 liquid_keyboard:

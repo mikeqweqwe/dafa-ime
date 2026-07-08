@@ -218,8 +218,9 @@ class AppPrefs(
         var popupWindowEnabled: Boolean = false
             get() = prefs.getPref(FLOATING_WINDOW_ENABLED, true)
             private set
+        // 預設開：iOS 式按鍵泡泡（只對字元鍵，見 Key.isPreviewable）
         var popupKeyPressEnabled: Boolean = false
-            get() = prefs.getPref(POPUP_KEY_PRESS_ENABLED, false)
+            get() = prefs.getPref(POPUP_KEY_PRESS_ENABLED, true)
             private set
         // 預設關：iOS 化——候選列只放候選，schema 狀態列（→英數/全形/繁體）是最大視覺雜訊，
         // 進階使用者可在設定頁開回

@@ -85,6 +85,7 @@ public class Key {
   private int key_symbol_offset_y;
   private int key_hint_offset_x;
   private int key_hint_offset_y;
+  private boolean keyShadow = true; // iOS 式鍵帽底部投影；浮起鍵（🌐🎙）設 key_shadow: false 關掉
   private int key_press_offset_x;
   private int key_press_offset_y;
   private int x;
@@ -146,6 +147,7 @@ public class Key {
     key_symbol_color = Config.getColor(context, mk, "key_symbol_color");
     hilited_key_symbol_color = Config.getColor(context, mk, "hilited_key_symbol_color");
     round_corner = ConfigGetter.getFloat(mk, "round_corner", 0);
+    keyShadow = ConfigGetter.getBoolean(mk, "key_shadow", true);
   }
 
   public static Map<String, Map<String, String>> getPresetKeys() {
@@ -579,8 +581,37 @@ public class Key {
   }
 
   public String getPreviewText(int type) {
-    if (type == KeyEventType.CLICK.ordinal()) return getEvent().getPreviewText();
+    if (type == KeyEventType.CLICK.ordinal()) {
+      // 泡泡顯示鍵面實際字（注音鍵 click 是大千鍵碼「1」，泡泡要顯示「ㄅ」）
+      final String displayLabel = getLabel();
+      if (!TextUtils.isEmpty(displayLabel) && !"enter_labels".equals(displayLabel))
+        return displayLabel;
+      return getEvent().getPreviewText();
+    }
     return getEvent(type).getPreviewText();
+  }
+
+  /** iOS 式泡泡只對字元鍵彈出：空白/⏎/⌫/⇧/鍵盤切換/功能鍵不彈 */
+  public boolean isPreviewable() {
+    final Event click = getClick();
+    if (click == null) return false;
+    final int c = click.getCode();
+    if (c == KeyEvent.KEYCODE_SPACE
+        || c == KeyEvent.KEYCODE_ENTER
+        || c == KeyEvent.KEYCODE_DEL
+        || c == KeyEvent.KEYCODE_SHIFT_LEFT
+        || c == KeyEvent.KEYCODE_SHIFT_RIGHT
+        || c == KeyEvent.KEYCODE_EISU
+        || c == KeyEvent.KEYCODE_FUNCTION
+        || c == KeyEvent.KEYCODE_SWITCH_CHARSET
+        || c == KeyEvent.KEYCODE_LANGUAGE_SWITCH) return false;
+    if (c > 0) return true; // 字母/數字/符號鍵碼
+    // code=0 同時是 KEYCODE_UNKNOWN/VoidSymbol/純文字鍵：只有帶文字的（€「」等）可預覽
+    return !TextUtils.isEmpty(click.getText());
+  }
+
+  public boolean hasKeyShadow() {
+    return keyShadow;
   }
 
   public String getSymbolLabel() {

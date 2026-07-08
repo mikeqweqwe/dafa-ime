@@ -193,9 +193,19 @@ class TextInputManager private constructor() :
                 else -> {
                     val inputAttrsRaw = instance.editorInfo!!.inputType
                     when (inputAttrsRaw and InputType.TYPE_MASK_CLASS) {
-                        InputType.TYPE_CLASS_NUMBER,
-                        InputType.TYPE_CLASS_PHONE,
+                        // 數字類欄位一律強制 ascii（不依賴鍵盤 YAML 的 reset flag），
+                        // 並分流到對應鍵盤：純數字/日期→九宮格、電話→電話盤
+                        InputType.TYPE_CLASS_NUMBER -> {
+                            tempAsciiMode = true
+                            "numpad"
+                        }
+                        InputType.TYPE_CLASS_PHONE -> {
+                            tempAsciiMode = true
+                            "phonepad"
+                        }
                         InputType.TYPE_CLASS_DATETIME -> {
+                            // 日期時間需要 : / - 分隔符，九宮格放不下 → 用數字符號頁
+                            tempAsciiMode = true
                             "number"
                         }
                         InputType.TYPE_CLASS_TEXT -> {
