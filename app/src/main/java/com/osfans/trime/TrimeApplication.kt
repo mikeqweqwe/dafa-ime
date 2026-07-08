@@ -38,6 +38,14 @@ class TrimeApplication : Application() {
             }
             val prefs = AppPrefs.initDefault(this)
             prefs.initDefaultPreferences()
+            // 遷移 legacy /sdcard/rime：該目錄跨安裝會孤兒化（MediaProvider owner 消失、
+            // 無儲存權限讀寫不到）→ 部署失敗 → 鍵盤崩潰。必須在任何 Config/Rime 載入前改掉
+            // （Config 把目錄存成 static final，class load 後改 prefs 不生效）
+            val legacyDirs = setOf("/sdcard/rime", "/storage/emulated/0/rime")
+            if (prefs.conf.userDataDir.trimEnd('/') in legacyDirs) {
+                prefs.conf.userDataDir = prefs.conf.sharedDataDir
+                Timber.i("Migrated legacy user_data_dir /sdcard/rime -> %s", prefs.conf.userDataDir)
+            }
             // record last pid for crash logs
             val appPrefs = AppPrefs.defaultInstance()
             val currentPid = Process.myPid()

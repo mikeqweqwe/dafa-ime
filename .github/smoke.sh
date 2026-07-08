@@ -25,7 +25,8 @@ adb shell input tap $((W * 45 / 100)) $((H * 94 / 100)) || true
 sleep 5
 
 # 等 RIME full deploy 編譯 build/（首次叫鍵盤時同步進行），輪詢 user 目錄的 build
-BUILD_FILE=/storage/emulated/0/rime/build/default.yaml
+# dafa.15 起 user_data_dir=app 專屬目錄（與 shared 相同），build 在其下
+BUILD_FILE=/storage/emulated/0/Android/data/com.tumuyan.trime/files/rime/build/default.yaml
 DEPLOY_OK=no
 for i in $(seq 1 24); do
   sleep 5
@@ -56,7 +57,7 @@ adb shell "ps -A | grep -i tumuyan" | grep -q tumuyan && ALIVE=yes
   echo "CRASH=$CRASH"
   echo "PROCESS_ALIVE=$ALIVE"
   echo "BUILD_DIR_LISTING:"
-  adb shell "ls -la /storage/emulated/0/rime/build" 2>&1 || true
+  adb shell "ls -la /storage/emulated/0/Android/data/com.tumuyan.trime/files/rime/build" 2>&1 || true
 } > smoke-verdict.txt
 cat smoke-verdict.txt
 exit 0

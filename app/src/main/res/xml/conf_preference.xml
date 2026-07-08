@@ -9,10 +9,12 @@
         android:title="@string/conf__shared_data_dir_title"
         app:useSimpleSummaryProvider="true"/>
 
+    <!-- 不設 defaultValue：讓 AppPrefs 落到 app 專屬外部目錄(Android/data/…/files/rime)。
+         /sdcard/rime 在 Android 11+ 會跨安裝變孤兒檔案(MediaProvider owner 消失)，
+         重裝後無權限讀寫 → 部署失敗 → 鍵盤崩潰 -->
     <EditTextPreference android:key="conf__user_data_dir"
         app:iconSpaceReserved="false"
         android:title="@string/conf__user_data_dir_title"
-        android:defaultValue="@string/conf__default_user_data_dir"
         app:useSimpleSummaryProvider="true"/>
 
     <Preference android:key="conf__synchronize"
