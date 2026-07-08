@@ -157,8 +157,6 @@
     <string name="about__used_library_dialog_title">Trime | Open Source Libraries</string>
     <string name="pref__system_default">System Default</string>
     <string name="keyboard__key_swipe_travel_title">Min travel for gesture</string>
-    <string name="keyboard__hook_candidate">Click candidate</string>
-    <string name="keyboard__hook_candidate_commit">Send Space when click candidate (coming soon)</string>
     <string name="trime_app_slogan">Trimes with Your Keystrokes</string>
     <string name="external_storage_access_required">Trime needs to access external storage to deploy or read schemas and config, tap OK to grant the permission.</string>
     <string name="external_storage_permission_not_available">External storage permission is not available</string>
@@ -191,8 +189,6 @@
     <string name="keyboard__hook_ctrl_lr">Hook Ctrl+Left/Right</string>
     <string name="keyboard__hook_ctrl_zy">Hook Ctrl+Z/Y</string>
     <string name="pref_keyboard__hook_summary">Not handled by the App being edited or librime</string>
-    <string name="keyboard__hook_candidate_on">Commit directly</string>
-    <string name="keyboard__hook_candidate_off">Send number key to librime</string>
 <string name="keyboard__key_swipe_travel_hi_title">The distance to trigger the swipe gesture</string>
      <string name="keyboard__key_swipe_time_hi_title">Determine the time interval for consecutive keystrokes</string>
      <string name="keyboard__hook_fast_input">Time interval as fast input </string>

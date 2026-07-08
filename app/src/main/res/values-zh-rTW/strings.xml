@@ -157,8 +157,6 @@
     <string name="about__used_library_dialog_title">大發輸入法 | 開源軟體庫</string>
     <string name="pref__system_default">系統預設</string>
     <string name="keyboard__key_swipe_travel_title">觸發滑動手勢的最短距離</string>
-    <string name="keyboard__hook_candidate">點擊候選詞</string>
-    <string name="keyboard__hook_candidate_commit">點擊候選詞後，模擬空格鍵完成上屏(暫未實現)</string>
     <string name="trime_app_slogan">擊響中文之韻</string>
     <string name="external_storage_access_required">大發輸入法需要儲存許可權以部署或讀取方案和配置，點選“確定”前往授權。</string>
     <string name="external_storage_permission_not_available">儲存許可權不可用</string>
@@ -191,8 +189,6 @@
     <string name="keyboard__hook_ctrl_lr">攔截 Ctrl+Left/Right</string>
     <string name="keyboard__hook_ctrl_zy">攔截 Ctrl+Z/Y</string>
     <string name="pref_keyboard__hook_summary">事件不發送給被編輯的 App 及 librime</string>
-    <string name="keyboard__hook_candidate_on">直接上屏候選詞</string>
-    <string name="keyboard__hook_candidate_off">發送數字鍵模擬鍵盤錄入</string>
 <string name="keyboard__key_swipe_travel_hi_title">連續擊鍵時觸發滑動手勢的距離</string>
     <string name="keyboard__key_swipe_time_hi_title">判定為連續擊鍵的時間間隔</string>
     <string name="keyboard__hook_fast_input">攔截字母鍵的快速輸入</string>
