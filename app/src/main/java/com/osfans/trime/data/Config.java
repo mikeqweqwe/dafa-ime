@@ -69,8 +69,15 @@ public class Config {
 
   private static final AppPrefs appPrefs = AppPrefs.defaultInstance();
 
-  private static final String sharedDataDir = appPrefs.getConf().getSharedDataDir();
-  private static final String userDataDir = appPrefs.getConf().getUserDataDir();
+  // 目錄要每次讀活值：使用者可在設定頁改路徑、TrimeApplication 啟動時會遷移 legacy 值；
+  // 存成 static final 會凍結在 class load 當下，與 Rime.init 實際使用的路徑分歧
+  private static String getSharedDataDir() {
+    return appPrefs.getConf().getSharedDataDir();
+  }
+
+  private static String getUserDataDir() {
+    return appPrefs.getConf().getUserDataDir();
+  }
 
   public static synchronized Config get(Context context) {
     if (self == null) self = new Config(context);
@@ -178,6 +185,7 @@ public class Config {
     String methodName =
         "\t<TrimeInit>\t" + Thread.currentThread().getStackTrace()[2].getMethodName() + "\t";
     Timber.d(methodName);
+    final String sharedDataDir = getSharedDataDir();
     boolean isExist = new File(sharedDataDir).exists();
     boolean isOverwrite = AppVersionUtils.INSTANCE.isDifferentVersion(appPrefs);
     String defaultFile = "trime.yaml";
@@ -208,14 +216,12 @@ public class Config {
     Timber.d(methodName + "Rime.get");
     // build/default.yaml 是 full deploy 的產物；缺失代表 RIME 從未完成部署（或部署中被殺），
     // 此時不論目錄是否存在都必須 full deploy，否則 schema/主題載入不了。
-    // 注意：librime 把 build 產物寫在 userDataDir（實機為 /sdcard/rime），不是 sharedDataDir
-    final File deployedDefault = new File(userDataDir, "build" + File.separator + "default.yaml");
-    Rime.get(context, !isExist || !isValidFile(deployedDefault));
+    // 注意：librime 把 build 產物寫在 userDataDir，不是 sharedDataDir
+    final File deployedDefault =
+        new File(getUserDataDir(), "build" + File.separator + "default.yaml");
+    Rime.ensureDeployed(context, !isExist || !isValidFile(deployedDefault), deployedDefault);
     if (!isValidFile(deployedDefault)) {
-      // Rime 可能在本次 get 之前已被初始化（get 對已存在的實例不做 full_check）→ 重建一次補部署
-      Timber.w(methodName + "build products missing, force full deploy");
-      Rime.destroy();
-      Rime.get(context, true);
+      Timber.e(methodName + "full deploy failed, build products still missing");
     }
     Timber.d(methodName + "finish");
   }
@@ -225,7 +231,7 @@ public class Config {
   }
 
   public static String[] getThemeKeys(boolean isUser) {
-    File d = new File(isUser ? userDataDir : sharedDataDir);
+    File d = new File(isUser ? getUserDataDir() : getSharedDataDir());
     FilenameFilter trimeFilter = (dir, filename) -> filename.endsWith("trime.yaml");
     String[] list = d.list(trimeFilter);
     if (list != null) return list;
@@ -233,7 +239,7 @@ public class Config {
   }
 
   public static String[] getSoundPackages() {
-    File d = new File(userDataDir, "sound");
+    File d = new File(getUserDataDir(), "sound");
     FilenameFilter trimeFilter = (dir, filename) -> filename.endsWith(".sound.yaml");
     String[] list = d.list(trimeFilter);
     if (list != null) return list;
@@ -261,7 +267,7 @@ public class Config {
         copyFile(path, overwrite);
       } else {
         // Dirs
-        final File dir = new File(sharedDataDir, path);
+        final File dir = new File(getSharedDataDir(), path);
         if (!dir.exists()) // noinspection ResultOfMethodCallIgnored
         dir.mkdir();
         for (String asset : assets) {
@@ -279,7 +285,7 @@ public class Config {
   private void copyFile(String fileName, boolean overwrite) {
     if (fileName == null) return;
 
-    final String targetFileName = new File(sharedDataDir, fileName).getPath();
+    final String targetFileName = new File(getSharedDataDir(), fileName).getPath();
     if (new File(targetFileName).exists() && !overwrite) return;
     final String sourceFileName = new File(RIME, fileName).getPath();
     try (InputStream in = assetManager.open(sourceFileName);
@@ -296,7 +302,7 @@ public class Config {
   }
 
   private void deployTheme() {
-    if (userDataDir.contentEquals(sharedDataDir)) return; // 相同文件夾不部署主題
+    if (getUserDataDir().contentEquals(getSharedDataDir())) return; // 相同文件夾不部署主題
     final String[] configs = getThemeKeys(false);
     for (String config : configs) Rime.deploy_config_file(config, "config_version");
   }
@@ -310,7 +316,8 @@ public class Config {
   // 设置音效包
   public void setSoundPackage(String name) {
     soundPackageName = name;
-    String path = userDataDir + File.separator + "sound" + File.separator + name + ".sound.yaml";
+    String path =
+        getUserDataDir() + File.separator + "sound" + File.separator + name + ".sound.yaml";
     File file = new File(path);
     if (file.exists()) {
       applySoundPackage(file, name);
@@ -325,7 +332,7 @@ public class Config {
       InputStream in = new FileInputStream(file);
       OutputStream out =
           new FileOutputStream(
-              userDataDir + File.separator + "build" + File.separator + name + ".sound.yaml");
+              getUserDataDir() + File.separator + "build" + File.separator + name + ".sound.yaml");
 
       byte[] buffer = new byte[1024];
       int len;
@@ -352,7 +359,7 @@ public class Config {
       String sound = (String) m.get("sound");
       if (!Objects.equals(sound, currentSound)) {
         String path =
-            userDataDir + File.separator + "sound" + File.separator + sound + ".sound.yaml";
+            getUserDataDir() + File.separator + "sound" + File.separator + sound + ".sound.yaml";
         File file = new File(path);
         if (file.exists()) {
           applySoundPackage(file, sound);
@@ -366,13 +373,13 @@ public class Config {
     }
   }
 
-  private void init(boolean skip_delopy) {
+  private void init(boolean skipDeploy) {
     Timber.d("init() themeName=%s schema_id=%s", themeName, schema_id);
     try {
       String file_name = themeName + ".yaml";
-      if (skip_delopy) {
+      if (skipDeploy) {
         File f = new File(Rime.get_user_data_dir() + File.separator + "build", file_name);
-        if (f.exists()) {
+        if (isValidFile(f)) {
           Timber.d("init() deploy_config_file skip");
         } else {
           Rime.deploy_config_file(file_name, "config_version");
@@ -384,8 +391,9 @@ public class Config {
 
       Map<String, Map<String, ?>> globalThemeConfig = Rime.config_get_map(themeName, "");
       if (globalThemeConfig == null) {
-        themeName = defaultName;
-        globalThemeConfig = Rime.config_get_map(themeName, "");
+        // 讀不到主題設定＝主題檔壞了或部署失敗，丟給 catch 統一走 fallback
+        // （不能在這裡就地改 themeName 重讀：那會讓 catch 的防遞歸判斷失真）
+        throw new IllegalStateException("cannot load theme config: " + themeName);
       }
       Timber.d("init() load_map done");
       mDefaultStyle = (Map<?, ?>) globalThemeConfig.get("style");
@@ -395,6 +403,8 @@ public class Config {
           (Map<String, Map<String, String>>) globalThemeConfig.get("preset_color_schemes");
       presetKeyboards = (Map<String, Map<String, ?>>) globalThemeConfig.get("preset_keyboards");
       liquidKeyboard = globalThemeConfig.get("liquid_keyboard");
+      // 主題檔可能缺整段（如 preset_keyboards）而不拋錯，缺段一律補空 map，別讓下游 NPE
+      normalizeThemeMaps();
       initLiquidKeyboard();
       Timber.d("init() initLiquidKeyboard done");
       Rime.setShowSwitches(appPrefs.getKeyboard().getSwitchesEnabled());
@@ -411,8 +421,28 @@ public class Config {
       if (!defaultName.equals(themeName)) {
         themeName = defaultName;
         init(false);
+      } else {
+        // 內建主題也失敗（部署徹底壞了）：補空主題結構。
+        // 寧可顯示無配色的空鍵盤，也不能讓半初始化 Config 流出——
+        // 下游拆箱/遍歷 null 會 NPE，IME 進崩潰迴圈（dafa.14 實機案例）
+        applyBlankTheme();
       }
     }
+  }
+
+  /** 把還是 null 的主題結構補成空值，避免下游 NPE 崩潰迴圈 */
+  private void normalizeThemeMaps() {
+    if (mDefaultStyle == null) mDefaultStyle = new HashMap<>();
+    if (fallbackColors == null) fallbackColors = new HashMap<>();
+    if (Key.presetKeys == null) Key.presetKeys = new HashMap<>();
+    if (presetColorSchemes == null) presetColorSchemes = new HashMap<>();
+    if (presetKeyboards == null) presetKeyboards = new HashMap<>();
+  }
+
+  /** init 徹底失敗（連內建主題都載不到）時的最後防線 */
+  private void applyBlankTheme() {
+    normalizeThemeMaps();
+    if (mEnterLabels == null) initEnterLabels(); // 不依賴主題，只會填內建預設值
   }
 
   public void reset() {
@@ -481,6 +511,7 @@ public class Config {
 
   private String getKeyboardName(@NonNull String name) {
     if (name.contentEquals(".default")) {
+      if (schema_id == null) return "default"; // 部署失敗時沒有 schema
       if (presetKeyboards.containsKey(schema_id)) name = schema_id; // 匹配方案名
       else {
         if (schema_id.contains("_")) name = schema_id.split("_")[0];
@@ -500,9 +531,10 @@ public class Config {
     }
     if (!presetKeyboards.containsKey(name)) name = "default";
     @Nullable final Map<?, ?> m = (Map<?, ?>) presetKeyboards.get(name);
-    assert m != null;
+    if (m == null) return name; // 空主題連 default 鍵盤都沒有，getKeyboard 會給零鍵 fallback
     if (m.containsKey("import_preset")) {
-      name = Objects.requireNonNull(m.get("import_preset")).toString();
+      final Object imported = m.get("import_preset");
+      if (imported != null) name = imported.toString();
     }
     return name;
   }
@@ -510,6 +542,11 @@ public class Config {
   public List<String> getKeyboardNames() {
     final List<?> names = (List<?>) getValue("keyboards");
     final List<String> keyboards = new ArrayList<>();
+    if (names == null) {
+      // 空主題（部署失敗）：至少回一個佔位鍵盤，KeyboardSwitcher 拿到空清單會出界崩潰
+      keyboards.add("default");
+      return keyboards;
+    }
     for (Object s : names) {
       s = getKeyboardName((String) s);
       if (!keyboards.contains(s)) keyboards.add((String) s);
@@ -545,7 +582,12 @@ public class Config {
 
   public Map<String, ?> getKeyboard(String name) {
     if (!presetKeyboards.containsKey(name)) name = "default";
-    return (Map<String, ?>) presetKeyboards.get(name);
+    final Map<String, ?> keyboard = (Map<String, ?>) presetKeyboards.get(name);
+    if (keyboard != null) return keyboard;
+    // 空主題（部署失敗）：回零鍵鍵盤——Keyboard 建構子對 null config/keys 會 NPE
+    final Map<String, Object> blank = new HashMap<>();
+    blank.put("keys", new ArrayList<>());
+    return blank;
   }
 
   public Map<String, ?> getLiquidKeyboard() {
@@ -662,7 +704,11 @@ public class Config {
     }
     o = getColorObject(key);
     if (o == null) {
-      o = ((Map<?, ?>) Objects.requireNonNull(presetColorSchemes.get(colorID))).get(key);
+      final Map<?, ?> map = (Map<?, ?>) presetColorSchemes.get(colorID);
+      // 空主題（部署失敗）沒有任何配色：回灰色而不是 null——
+      // 呼叫端多半直接拆箱成 int，null 會 NPE（dafa.14 TabView 崩潰點）
+      if (map == null) return Color.GRAY;
+      o = map.get(key);
     }
     return parseColor(o);
   }
@@ -765,6 +811,7 @@ public class Config {
     if (!presetColorSchemes.containsKey(scheme)) scheme = getString("color_scheme"); // 主題中指定的配色
     if (!presetColorSchemes.containsKey(scheme)) scheme = "default"; // 主題中的default配色
     Map<String, ?> color = (Map<String, ?>) presetColorSchemes.get(scheme);
+    if (color == null) return scheme; // 空主題（部署失敗）連 default 配色都沒有
     if (color.containsKey("dark_scheme") || color.containsKey("light_scheme")) hasDarkLight = true;
     return scheme;
   }
@@ -786,6 +833,7 @@ public class Config {
     if (!presetColorSchemes.containsKey(scheme)) scheme = getString("color_scheme"); // 主題中指定的配色
     if (!presetColorSchemes.containsKey(scheme)) scheme = "default"; // 主題中的default配色
     Map<String, ?> color = (Map<String, ?>) presetColorSchemes.get(scheme);
+    if (color == null) return scheme; // 空主題（部署失敗）連 default 配色都沒有
     if (darkMode) {
       if (color.containsKey("dark_scheme")) {
         return (String) color.get("dark_scheme");

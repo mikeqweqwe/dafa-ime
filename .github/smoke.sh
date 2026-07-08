@@ -33,7 +33,7 @@ for i in $(seq 1 24); do
     DEPLOY_OK=yes
     break
   fi
-  if adb logcat -d 2>/dev/null | grep -A2 -E "StackOverflowError|FATAL EXCEPTION|Fatal signal" | grep -qi tumuyan; then
+  if adb logcat -d 2>/dev/null | grep -A2 -E "StackOverflowError|FATAL EXCEPTION|Fatal signal" | grep -qiE "tumuyan|osfans"; then
     break
   fi
   sleep 5
@@ -55,8 +55,9 @@ grep -iE "tumuyan|TrimeIme|AndroidRuntime|FATAL|StackOverflow|Fatal signal|Rime|
 
 # 硬指標判定（含 native crash）
 CRASH=no
-if grep -q "StackOverflowError" smoke-logcat-full.txt; then CRASH=stackoverflow; fi
-if grep -A2 "FATAL EXCEPTION" smoke-logcat-full.txt | grep -qi tumuyan; then CRASH=fatal; fi
+# 都 scope 到本 app（process=tumuyan、stack frame=osfans），別讓系統其他 process 的崩潰誤紅
+if grep -A2 "StackOverflowError" smoke-logcat-full.txt | grep -qiE "tumuyan|osfans"; then CRASH=stackoverflow; fi
+if grep -A2 "FATAL EXCEPTION" smoke-logcat-full.txt | grep -qiE "tumuyan|osfans"; then CRASH=fatal; fi
 if grep "Fatal signal" smoke-logcat-full.txt | grep -qi tumuyan; then CRASH=native; fi
 ALIVE=no
 grep -q tumuyan smoke-ps.txt && ALIVE=yes
@@ -67,4 +68,10 @@ grep -q tumuyan smoke-ps.txt && ALIVE=yes
   echo "BUILD_DIR_LISTING:"
   adb shell "ls -la /storage/emulated/0/Android/data/com.tumuyan.trime/files/rime/build" 2>&1 || true
 } | tee smoke-verdict.txt
-exit 0
+
+# 硬指標不過就讓 CI 紅：exit 0 會讓部署失敗/崩潰靜默過關（artifacts 上傳有 if: always() 不受影響）
+if [ "$DEPLOY_OK" = yes ] && [ "$CRASH" = no ] && [ "$ALIVE" = yes ]; then
+  exit 0
+fi
+echo "SMOKE FAILED: DEPLOY_OK=$DEPLOY_OK CRASH=$CRASH ALIVE=$ALIVE"
+exit 1

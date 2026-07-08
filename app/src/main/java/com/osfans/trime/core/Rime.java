@@ -19,6 +19,8 @@
 package com.osfans.trime.core;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -335,6 +337,7 @@ public class Rime {
     setup(sharedDataDir, userDataDir);
     Timber.d(methodName + "initlialize");
     initialize(sharedDataDir, userDataDir);
+    nativeInitialized = true;
 
     Timber.d(methodName + "check");
     check(full_check);
@@ -352,10 +355,34 @@ public class Rime {
     Timber.d(methodName + "finish");
   }
 
-  public static void destroy() {
+  // self 在 init 完整跑完後才賦值，不能拿來判斷 native 是否初始化
+  // （init 中途拋錯時 native 已 initialize、self 仍是 null）
+  private static boolean nativeInitialized = false;
+
+  public static synchronized void destroy() {
+    if (!nativeInitialized) {
+      self = null;
+      return; // 未初始化就 finalize 會動到 librime 未建立的狀態
+    }
     destroy_session();
     finalize1();
+    nativeInitialized = false;
     self = null;
+  }
+
+  /**
+   * 確保 full deploy 產物存在。get 對已存在的實例不做 full_check，這種情況要重建補部署；
+   * 剛部署完就失敗的情況不重試（部署同步佔住啟動路徑，重試只會加倍卡死時間）。 整段上鎖：alive 判斷與 get 之間若被其他執行緒建立實例，會漏掉補部署。
+   */
+  public static synchronized void ensureDeployed(
+      Context context, boolean needDeploy, File deployedDefault) {
+    final boolean alreadyAlive = self != null;
+    get(context, needDeploy);
+    if (needDeploy && alreadyAlive && !(deployedDefault.isFile() && deployedDefault.length() > 0)) {
+      Timber.w("build products missing, rebuild Rime to force full deploy");
+      destroy();
+      get(context, true);
+    }
   }
 
   public static String getCommitText() {
@@ -606,8 +633,14 @@ public class Rime {
     return selectSchema(target);
   }
 
-  public static Rime get(Context context, boolean full_check) {
+  // get/destroy 以 Rime.class 上鎖：設定頁的重新部署跑在背景執行緒（RimeUtils.deploy
+  // 用 Dispatchers.IO destroy+get），與 IME 執行緒的 get 撞在一起會拿到半銷毀實例（native crash）
+  public static synchronized Rime get(Context context, boolean full_check) {
     if (self == null) {
+      if (nativeInitialized) {
+        // 上次 init 中途拋錯（native 已 initialize、self 沒賦值）：先 finalize 乾淨再重來
+        destroy();
+      }
       if (full_check) {
         OpenCCDictManager.internalDeploy();
       }
@@ -635,24 +668,41 @@ public class Rime {
   }
 
   public static void handleRimeNotification(String message_type, String message_value) {
-    mOnMessage = true;
     final RimeEvent event = RimeEvent.create(message_type, message_value);
-    // Timber.i("message: [%s] %s", message_type, message_value);
     Timber.i("Notification: %s", event);
-    final Trime trime = Trime.getService();
-    Timber.i("Notification: getService done, before det SchemaEvent");
-    if (event instanceof RimeEvent.SchemaEvent) {
-      initSchema();
-      trime.initKeyboard();
-      Timber.i("Notification: solve SchemaEvent");
-    } else if (event instanceof RimeEvent.OptionEvent) {
-      getStatus();
-      getContexts(); // 切換中英文、簡繁體時更新候選
-      final boolean value = !message_value.startsWith("!");
-      final String option = message_value.substring(value ? 0 : 1);
-      trime.textInputManager.onOptionChanged(option, value);
+    // JNI 從觸發操作的執行緒直接回呼（部署時是背景/維護執行緒）。事件處理會重入
+    // Config/Trime（UI），除了背景執行緒碰 UI 外，還會在對方持有 Rime.class 鎖時
+    // 反向等 Config.class，形成 ABBA 死鎖 → 統一丟回主執行緒處理
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      handleRimeEvent(event, message_value);
+    } else {
+      new Handler(Looper.getMainLooper()).post(() -> handleRimeEvent(event, message_value));
     }
-    mOnMessage = false;
+  }
+
+  private static void handleRimeEvent(RimeEvent event, String message_value) {
+    // self 要 init 完整跑完才賦值：null 代表 Rime 正在重建（destroy+get 部署中）或已銷毀，
+    // 此時跑 initSchema/getContexts 會撞上進行中的 native init 或摸到已 finalize 的狀態。
+    // 部署完成後的鍵盤刷新由 onStartInputView 兜底，丟棄過期事件是安全的
+    if (self == null) return;
+    final Trime trime = Trime.getServiceOrNull();
+    if (trime == null) return; // IME service 未啟動（如從設定頁部署）
+    mOnMessage = true;
+    try {
+      if (event instanceof RimeEvent.SchemaEvent) {
+        initSchema();
+        trime.initKeyboard();
+        Timber.i("Notification: solve SchemaEvent");
+      } else if (event instanceof RimeEvent.OptionEvent) {
+        getStatus();
+        getContexts(); // 切換中英文、簡繁體時更新候選
+        final boolean value = !message_value.startsWith("!");
+        final String option = message_value.substring(value ? 0 : 1);
+        trime.textInputManager.onOptionChanged(option, value);
+      }
+    } finally {
+      mOnMessage = false;
+    }
   }
 
   public static String openccConvert(String line, String name) {

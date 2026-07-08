@@ -345,11 +345,15 @@ class AppPrefs(
             const val LAST_BACKGROUND_SYNC = "conf__last_background_sync"
             val EXTERNAL_PATH_PREFIX: String = appContext.getExternalFilesDir(null)!!.absolutePath
         }
+        // ifBlank：設定頁 EditTextPreference 沒有 defaultValue，使用者清空按確定會存進 ""，
+        // getString 對已存在的 "" 不會回 default → new File("") 會把 RIME 指到未知路徑
         var sharedDataDir: String
             get() = prefs.getPref(SHARED_DATA_DIR, "$EXTERNAL_PATH_PREFIX/rime")
+                .ifBlank { "$EXTERNAL_PATH_PREFIX/rime" }
             set(v) = prefs.setPref(SHARED_DATA_DIR, v)
         var userDataDir: String
             get() = prefs.getPref(USER_DATA_DIR, "$EXTERNAL_PATH_PREFIX/rime")
+                .ifBlank { "$EXTERNAL_PATH_PREFIX/rime" }
             set(v) = prefs.setPref(USER_DATA_DIR, v)
         var syncBackgroundEnabled: Boolean
             get() = prefs.getPref(SYNC_BACKGROUND_ENABLED, false)
