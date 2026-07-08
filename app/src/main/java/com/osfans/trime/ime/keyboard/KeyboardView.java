@@ -988,7 +988,8 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
       }
       keyBackground.draw(canvas);
 
-      if (!TextUtils.isEmpty(label)) {
+      // trackpad 拖曳模式：鍵帽文字全部隱藏（iOS 行為），只留鍵帽形狀
+      if (!mSpaceTrackpad && !TextUtils.isEmpty(label)) {
         // For characters, use large font. For labels like "Done", use small font.
         if (key.getKey_text_size() != null && key.getKey_text_size() > 0) {
           paint.setTextSize(key.getKey_text_size());
@@ -1384,8 +1385,8 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     mTrackpadStepPx = computeTrackpadStepPx();
     mHandler.removeMessages(MSG_REPEAT);
     showPreview(NOT_A_KEY);
-    // 半透明作為「游標模式」視覺回饋（iOS 是鍵帽全變空白，先用最小方案）
-    setAlpha(0.6f);
+    // 重繪讓鍵帽文字消失（onBufferDraw 依 mSpaceTrackpad 跳過文字）
+    invalidateAllKeys();
   }
 
   private void finishSpaceTrackpad() {
@@ -1393,7 +1394,6 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     // 吞掉這次 touch 的 click，放開手指不上屏空白
     mAbortKey = true;
     removeMessages();
-    setAlpha(1f);
     showPreview(NOT_A_KEY);
     invalidateAllKeys();
   }
@@ -1856,7 +1856,7 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     }
     if (mSpaceTrackpad) {
       mSpaceTrackpad = false;
-      setAlpha(1f);
+      invalidateAllKeys();
     }
     removeMessages();
 
