@@ -49,8 +49,7 @@
         <item>always_show</item>
         <item>never_show</item>
     </string-array>
-    <string name="default_shared_data_dir" translatable="false">/sdcard/rime</string>
-    <string name="conf__default_user_data_dir" translatable="false">/sdcard/rime</string>
+    <!-- 勿再加回 /sdcard/rime 類預設：該目錄跨安裝孤兒化會害部署失敗（見 dafa.15 修復） -->
     <string-array name="keyboard__candidate_page_size_values">
         <item>10000</item>
         <item>10001</item>
