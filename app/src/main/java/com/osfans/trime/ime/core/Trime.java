@@ -1056,8 +1056,7 @@ public class Trime extends LifecycleInputMethodService {
             | KeyEvent.META_ALT_MASK
             | KeyEvent.META_SHIFT_MASK
             | KeyEvent.META_META_MASK;
-    if ((keyEventCode == KeyEvent.KEYCODE_ENTER
-            || keyEventCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+    if ((keyEventCode == KeyEvent.KEYCODE_ENTER || keyEventCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
         && (metaState & chordMask) == 0
         && Rime.isComposing()) {
       Rime.commitComposition();
