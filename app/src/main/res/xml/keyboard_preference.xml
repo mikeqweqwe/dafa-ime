@@ -39,7 +39,7 @@
             android:title="@string/keyboard__show_window_title"
             app:iconSpaceReserved="false" />
         <SwitchPreferenceCompat
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="keyboard__soft_cursor"
             android:title="@string/keyboard__soft_cursor_title"
             app:iconSpaceReserved="false" />

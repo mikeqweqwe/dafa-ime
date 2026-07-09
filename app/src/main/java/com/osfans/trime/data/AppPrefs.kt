@@ -212,8 +212,10 @@ class AppPrefs(
         var fullscreenMode: LandscapeInputUIMode
             get() = LandscapeInputUIMode.fromString(prefs.getPref(FULLSCREEN_MODE, "auto_show"))
             set(v) = prefs.setPref(FULLSCREEN_MODE, v)
+        // 關閉：游標改用系統 selection 顯示（EditorInstance），soft cursor 的「‸」字元
+        // 會在切走 app 時隨 composing 定稿成垃圾
         var softCursorEnabled: Boolean = false
-            get() = prefs.getPref(SOFT_CURSOR_ENABLED, true)
+            get() = prefs.getPref(SOFT_CURSOR_ENABLED, false)
             private set
         var popupWindowEnabled: Boolean = false
             get() = prefs.getPref(FLOATING_WINDOW_ENABLED, true)

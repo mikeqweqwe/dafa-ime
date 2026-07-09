@@ -69,6 +69,15 @@ public class Rime {
       return new String(bytes, 0, sel_start).length();
     }
 
+    /** 游標在 preedit 顯示字串中的字元位置（cursor_pos 是 UTF-8 byte offset） */
+    public int getCaretCharPos() {
+      if (length == 0 || preedit == null) return 0;
+      // 不用快取的 bytes 欄位：native 可能重用同一物件，舊 preedit 的 bytes 會算錯
+      final byte[] b = preedit.getBytes();
+      final int n = Math.max(0, Math.min(cursor_pos, b.length));
+      return new String(b, 0, n).length();
+    }
+
     public int getEnd() {
       if (length == 0) return 0;
       return new String(bytes, 0, sel_end).length();
@@ -296,6 +305,13 @@ public class Rime {
   public static String getCompositionText() {
     RimeComposition composition = getComposition();
     return (composition == null || composition.preedit == null) ? "" : composition.preedit;
+  }
+
+  /** preedit 顯示字串中的游標字元位置（無組字回 0） */
+  public static int getCompositionCaretChars() {
+    RimeComposition composition = getComposition();
+    if (composition == null || composition.preedit == null) return 0;
+    return composition.getCaretCharPos();
   }
 
   public static String getComposingText() {

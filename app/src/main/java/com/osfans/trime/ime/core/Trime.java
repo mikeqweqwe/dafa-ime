@@ -67,6 +67,7 @@ import com.osfans.trime.data.db.draft.DraftDao;
 import com.osfans.trime.databinding.CompositionRootBinding;
 import com.osfans.trime.databinding.InputRootBinding;
 import com.osfans.trime.ime.broadcast.IntentReceiver;
+import com.osfans.trime.ime.enums.InlineModeType;
 import com.osfans.trime.ime.enums.Keycode;
 import com.osfans.trime.ime.enums.PositionType;
 import com.osfans.trime.ime.enums.SymbolKeyboardType;
@@ -706,11 +707,29 @@ public class Trime extends LifecycleInputMethodService {
       int candidatesEnd) {
     super.onUpdateSelection(
         oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd);
+    activeEditorInstance.onComposingRangeChanged(candidatesStart);
+    if (activeEditorInstance.consumeOwnSelectionUpdate(newSelStart, newSelEnd)) {
+      // 自己 setSelection 造成的回報：不能再餵回引擎，否則與 updateComposing 互相拉扯
+      dispatchCapsStateToInputView();
+      return;
+    }
     if ((candidatesEnd != -1) && ((newSelStart != candidatesEnd) || (newSelEnd != candidatesEnd))) {
       // 移動光標時，更新候選區
       if ((newSelEnd < candidatesEnd) && (newSelEnd >= candidatesStart)) {
-        final int n = newSelEnd - candidatesStart;
-        Rime.RimeSetCaretPos(n);
+        // 顯示字串位置→raw 輸入碼位置：扣掉 preedit 的音節分隔符（空格／U+2002），
+        // 其餘字元與 raw 一一對應；直接用顯示位置會讓補打插錯地方。
+        // 只有 INLINE_COMPOSITION 顯示 preedit，其他嵌入模式維持原始行為
+        final int displayPos = newSelEnd - candidatesStart;
+        int rawPos = displayPos;
+        if (getPrefs().getKeyboard().getInlinePreedit() == InlineModeType.INLINE_COMPOSITION) {
+          final String preedit = Rime.getCompositionText();
+          rawPos = 0;
+          for (int i = 0; i < displayPos && i < preedit.length(); i++) {
+            final char c = preedit.charAt(i);
+            if (c != ' ' && c != '\u2002' && c != '\u2038') rawPos++;
+          }
+        }
+        Rime.RimeSetCaretPos(rawPos);
         updateComposing();
       }
     }

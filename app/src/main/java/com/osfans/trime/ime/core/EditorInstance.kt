@@ -35,6 +35,23 @@ class EditorInstance(private val ims: InputMethodService) {
     var lastCommittedText: CharSequence = ""
     var draftCache: String = ""
 
+    // 系統游標方案：composing 起點由 onUpdateSelection 的 candidatesStart 回報；
+    // expectedSelection 用來吃掉自己 setSelection 觸發的回報，防止與引擎互相拉扯
+    var composingRegionStart: Int = -1
+    private var expectedSelection: Int = -1
+
+    fun onComposingRangeChanged(start: Int) {
+        composingRegionStart = start
+    }
+
+    fun consumeOwnSelectionUpdate(selStart: Int, selEnd: Int): Boolean {
+        if (expectedSelection >= 0 && selStart == expectedSelection && selEnd == expectedSelection) {
+            expectedSelection = -1
+            return true
+        }
+        return false
+    }
+
     fun commitText(text: CharSequence, dispatchToRime: Boolean = true): Boolean {
         val ic = inputConnection ?: return false
         ic.commitText(text, 1)
@@ -75,6 +92,18 @@ class EditorInstance(private val ims: InputMethodService) {
         }
         if (ic.getSelectedText(0).isNullOrEmpty() || !composingText.isNullOrEmpty()) {
             ic.setComposingText(composingText, 1)
+            // 游標不在組字尾（trackpad 拖回/點選組字中間）時，把系統游標移到對應位置：
+            // 游標用原生樣式顯示、composing 文字不含游標字元，切走 app 定稿也不留怪字元
+            if (prefs.keyboard.inlinePreedit == InlineModeType.INLINE_COMPOSITION &&
+                Rime.isComposing() && composingText.isNotEmpty() && composingRegionStart >= 0
+            ) {
+                val caret = Rime.getCompositionCaretChars()
+                if (caret < composingText.length) {
+                    val target = composingRegionStart + caret
+                    expectedSelection = target
+                    ic.setSelection(target, target)
+                }
+            }
         }
     }
 
@@ -83,14 +112,15 @@ class EditorInstance(private val ims: InputMethodService) {
         // librime 只格式化有 translator 的分段，游標後的分段以原始碼呈現——顯示前補轉，
         // 注音字元不在表內原樣保留，冪等
         // 不映射空格→ˉ：preedit 的音節分隔也是空格會被誤轉，一聲本就無標調。
-        // 「‸」是 librime 內建軟游標字元，順手換成 iOS 樣式的「|」
-        private const val DAQIAN_RAW = "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347‸"
-        private const val DAQIAN_BPMF = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙|"
+        // 游標改用系統 selection 顯示（soft_cursors 已關），殘留的「‸」直接濾掉
+        private const val DAQIAN_RAW = "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347"
+        private const val DAQIAN_BPMF = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙"
 
         private fun daqianToBpmf(s: String?): String {
             if (s.isNullOrEmpty()) return ""
             val sb = StringBuilder(s.length)
             for (c in s) {
+                if (c == '\u2038') continue // ‸
                 val i = DAQIAN_RAW.indexOf(c)
                 sb.append(if (i >= 0) DAQIAN_BPMF[i] else c)
             }
