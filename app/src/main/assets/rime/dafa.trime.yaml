@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.18"
+config_version: "3.19"
 name: dafa
 author: Hau Liu
 
@@ -66,7 +66,10 @@ style:
   latin_locale: en_US
   locale: zh_TW
   keyboard_height: 290
-  keyboard_height_land: 200
+  # 摺疊機展開態（系統判 landscape 763x692dp）：居中收窄到 ~500dp 寬、高度對齊直屏手感
+  keyboard_height_land: 260
+  keyboard_padding_land: 130
+  keyboard_padding_land_bottom: 12
   preview_font: latin.ttf
   preview_height: 56
   preview_offset: -12
