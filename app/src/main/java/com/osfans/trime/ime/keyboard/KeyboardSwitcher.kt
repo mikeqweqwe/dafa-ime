@@ -122,12 +122,10 @@ class KeyboardSwitcher {
         currentId = landRemap(if (id.isValidId()) id else 0)
     }
 
-    /** 展開（橫向）時自動換用同名 _land 分離佈局；摺回直屏時換回原佈局 */
+    /** 大螢幕（摺疊機展開，無論直橫握）自動換用同名 _land 分離佈局；摺回小螢幕還原 */
     private fun landRemap(id: Int): Int {
-        val land = (
-            Trime.getService().resources.configuration.orientation
-                == Configuration.ORIENTATION_LANDSCAPE
-            )
+        // 用寬度判定而非 orientation：展開內螢幕近方形，直握時系統判 portrait
+        val land = Trime.getService().resources.configuration.screenWidthDp >= 600
         val name = keyboardNames.getOrNull(id) ?: return id
         val target = if (land) {
             if (name.endsWith("_land")) name else name + "_land"
