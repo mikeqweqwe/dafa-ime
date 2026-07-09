@@ -1355,7 +1355,12 @@ public class Trime extends LifecycleInputMethodService {
 
   /** 模擬PC鍵盤中Esc鍵的功能：清除輸入的編碼和候選項 */
   private void performEscape() {
-    if (isComposing()) textInputManager.onKey(KeyEvent.KEYCODE_ESCAPE, 0);
+    if (isComposing()) {
+      textInputManager.onKey(KeyEvent.KEYCODE_ESCAPE, 0);
+      // onKey 只清了 RIME 組字；編輯器端 composing text 要主動清（正常打字靠按鍵
+      // 釋放事件觸發更新，這裡沒有），否則切走 app 時被系統定稿成垃圾（含軟游標字元）
+      updateComposing();
+    }
   }
 
   private void setNavBarColor() {
