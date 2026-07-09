@@ -119,7 +119,24 @@ class KeyboardSwitcher {
         if (lastId.isValidId() && keyboards[lastId].isLock) {
             lastLockId = lastId
         }
-        currentId = if (id.isValidId()) id else 0
+        currentId = landRemap(if (id.isValidId()) id else 0)
+    }
+
+    /** 展開（橫向）時自動換用同名 _land 分離佈局；摺回直屏時換回原佈局 */
+    private fun landRemap(id: Int): Int {
+        val land = (
+            Trime.getService().resources.configuration.orientation
+                == Configuration.ORIENTATION_LANDSCAPE
+            )
+        val name = keyboardNames.getOrNull(id) ?: return id
+        val target = if (land) {
+            if (name.endsWith("_land")) name else name + "_land"
+        } else {
+            name.removeSuffix("_land")
+        }
+        if (target == name) return id
+        val t = keyboardNames.indexOf(target)
+        return if (t >= 0) t else id
     }
 
     public fun getCurrentKeyboardName(): String {

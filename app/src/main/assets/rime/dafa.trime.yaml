@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.19"
+config_version: "3.20"
 name: dafa
 author: Hau Liu
 
@@ -59,7 +59,7 @@ style:
   key_long_text_size: 16
   key_text_size: 20
   key_width: 10.0
-  keyboards: [zhuyin, english, number, symbol, numpad, phonepad]
+  keyboards: [zhuyin, english, number, symbol, numpad, phonepad, zhuyin_land, english_land, number_land]
   label_text_size: 20
   label_font: label.ttf
   latin_font: latin.ttf
@@ -68,7 +68,7 @@ style:
   keyboard_height: 290
   # 摺疊機展開態（系統判 landscape 763x692dp）：居中收窄到 ~500dp 寬、高度對齊直屏手感
   keyboard_height_land: 260
-  keyboard_padding_land: 130
+  keyboard_padding_land: 0
   keyboard_padding_land_bottom: 12
   preview_font: latin.ttf
   preview_height: 56
@@ -217,6 +217,12 @@ preset_keys:
   Keyboard_number: {label: 123, functional: false, send: Eisu_toggle, select: number}
   Keyboard_symbol: {label: "#+=", functional: false, send: Eisu_toggle, select: symbol}
   Mic_placeholder: {label: "🎙", functional: false, send: VoidSymbol}
+  # 分離鍵盤（展開態）用
+  Keyboard_number2: {label: "!#1", functional: false, send: Eisu_toggle, select: number}
+  Keyboard_zhuyin_back: {label: 返回, functional: false, send: Eisu_toggle, select: zhuyin}
+  Keyboard_zhuyin_globe: {label: "🌐", functional: false, send: Eisu_toggle, select: zhuyin}
+  Keyboard_symbol_more: {label: 更多, functional: false, send: Eisu_toggle, select: symbol}
+  Slash_commit: {label: '/', functional: false, commit: '/'}
   liquid_keyboard_emoji: {label: "😀", send: function, command: liquid_keyboard, option: emoji}
 
 preset_keyboards:
@@ -489,6 +495,198 @@ preset_keyboards:
       - {label: '+＊#', click: '+', long_click: '*', swipe_up: '#', width: 33.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: '0', width: 33.4}
       - {click: BackSpace, width: 33.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+  # ============ 展開態分離鍵盤（iOS split 模板） ============
+  zhuyin_land:
+    name: 注音分離鍵盤
+    author: dafa
+    ascii_mode: 0
+    lock: true
+    width: 7.2
+    height: 44
+    keys:
+      # R1 左[ㄅㄉˇˋㄓˊ] 右[˙ㄚㄞㄢㄦ]
+      - {label: 'ㄅ', click: '1', width: 7.2}
+      - {label: 'ㄉ', click: '2', width: 7.2}
+      - {label: 'ˇ', click: '3', width: 7.2}
+      - {label: 'ˋ', click: '4', width: 7.2}
+      - {label: 'ㄓ', click: '5', width: 7.2}
+      - {label: 'ˊ', click: '6', width: 7.2}
+      - {width: 20.8}
+      - {label: '˙', click: '7', width: 7.2}
+      - {label: 'ㄚ', click: '8', width: 7.2}
+      - {label: 'ㄞ', click: '9', width: 7.2}
+      - {label: 'ㄢ', click: '0', width: 7.2}
+      - {label: 'ㄦ', click: '-', width: 7.2}
+      # R2 左[ㄆㄊㄍㄐㄔ] 右[ㄗㄧㄛㄟㄣ]
+      - {width: 2.9}
+      - {label: 'ㄆ', click: q, width: 7.2}
+      - {label: 'ㄊ', click: w, width: 7.2}
+      - {label: 'ㄍ', click: e, width: 7.2}
+      - {label: 'ㄐ', click: r, width: 7.2}
+      - {label: 'ㄔ', click: t, width: 7.2}
+      - {width: 22.2}
+      - {label: 'ㄗ', click: y, width: 7.2}
+      - {label: 'ㄧ', click: u, width: 7.2}
+      - {label: 'ㄛ', click: i, width: 7.2}
+      - {label: 'ㄟ', click: o, width: 7.2}
+      - {label: 'ㄣ', click: p, width: 7.2}
+      - {width: 2.9}
+      # R3 左[ㄇㄋㄎㄑㄕ] 右[ㄘㄨㄜㄠㄤ]
+      - {width: 5.8}
+      - {label: 'ㄇ', click: a, width: 7.2}
+      - {label: 'ㄋ', click: s, width: 7.2}
+      - {label: 'ㄎ', click: d, width: 7.2}
+      - {label: 'ㄑ', click: f, width: 7.2}
+      - {label: 'ㄕ', click: g, width: 7.2}
+      - {width: 16.4}
+      - {label: 'ㄘ', click: h, width: 7.2}
+      - {label: 'ㄨ', click: j, width: 7.2}
+      - {label: 'ㄜ', click: k, width: 7.2}
+      - {label: 'ㄠ', click: l, width: 7.2}
+      - {label: 'ㄤ', click: ';', width: 7.2}
+      - {width: 5.8}
+      # R4 左[ㄈㄌㄏㄒㄖㄙ] 右[ㄩㄝㄡㄥ⌫]
+      - {label: 'ㄈ', click: z, width: 7.2}
+      - {label: 'ㄌ', click: x, width: 7.2}
+      - {label: 'ㄏ', click: c, width: 7.2}
+      - {label: 'ㄒ', click: v, width: 7.2}
+      - {label: 'ㄖ', click: b, width: 7.2}
+      - {label: 'ㄙ', click: n, width: 7.2}
+      - {width: 19}
+      - {label: 'ㄩ', click: m, width: 7.2}
+      - {label: 'ㄝ', click: ',', width: 7.2}
+      - {label: 'ㄡ', click: '.', width: 7.2}
+      - {label: 'ㄥ', click: '/', width: 7.2}
+      - {click: BackSpace, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # R5 左[!#1 🌐 / 空白] 右[空白 。 123 前往]
+      - {click: Keyboard_number2, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_english, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Slash_commit, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space, width: 21}
+      - {width: 10}
+      - {click: space, width: 21}
+      - {click: '。', width: 7.5}
+      - {click: Keyboard_number, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Return, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+  english_land:
+    name: 英文分離鍵盤
+    author: dafa
+    ascii_mode: 1
+    lock: true
+    width: 7.2
+    height: 44
+    keys:
+      # R1 左[12345] 右[67890]
+      - {click: '1', width: 7.2}
+      - {click: '2', width: 7.2}
+      - {click: '3', width: 7.2}
+      - {click: '4', width: 7.2}
+      - {click: '5', width: 7.2}
+      - {width: 28}
+      - {click: '6', width: 7.2}
+      - {click: '7', width: 7.2}
+      - {click: '8', width: 7.2}
+      - {click: '9', width: 7.2}
+      - {click: '0', width: 7.2}
+      # R2 左[qwert] 右[yuiop]
+      - {click: q, width: 7.2}
+      - {click: w, width: 7.2}
+      - {click: e, width: 7.2}
+      - {click: r, width: 7.2}
+      - {click: t, width: 7.2}
+      - {width: 28}
+      - {click: y, width: 7.2}
+      - {click: u, width: 7.2}
+      - {click: i, width: 7.2}
+      - {click: o, width: 7.2}
+      - {click: p, width: 7.2}
+      # R3 左[asdfg] 右[hjkl]
+      - {width: 3.6}
+      - {click: a, width: 7.2}
+      - {click: s, width: 7.2}
+      - {click: d, width: 7.2}
+      - {click: f, width: 7.2}
+      - {click: g, width: 7.2}
+      - {width: 24.8}
+      - {click: h, width: 7.2}
+      - {click: j, width: 7.2}
+      - {click: k, width: 7.2}
+      - {click: l, width: 7.2}
+      - {width: 6.8}
+      # R4 左[⇧ zxcv] 右[bnm ⌫]
+      - {click: Shift_L, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: z, width: 7.2}
+      - {click: x, width: 7.2}
+      - {click: c, width: 7.2}
+      - {click: v, width: 7.2}
+      - {width: 31.6}
+      - {click: b, width: 7.2}
+      - {click: n, width: 7.2}
+      - {click: m, width: 7.2}
+      - {click: BackSpace, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # R5 左[!#1 🌐 / 空白] 右[空白 . 123 前往]
+      - {click: Keyboard_number2, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Keyboard_zhuyin_globe, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Slash_commit, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space, width: 21}
+      - {width: 10}
+      - {click: space, width: 21}
+      - {click: '.', width: 7.5}
+      - {click: Keyboard_number, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Return, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+  number_land:
+    name: 數字符號分離鍵盤
+    author: dafa
+    ascii_mode: 1
+    width: 9
+    height: 55
+    keys:
+      # R1 左[# $ & _ -] 右[1 2 3 ?]
+      - {click: '#', width: 9}
+      - {click: '$', width: 9}
+      - {click: '&', width: 9}
+      - {click: '_', width: 9}
+      - {click: '-', width: 9}
+      - {width: 10}
+      - {click: '1', width: 11.25}
+      - {click: '2', width: 11.25}
+      - {click: '3', width: 11.25}
+      - {click: '？', width: 11.25}
+      # R2 左[@ ( ) = +] 右[4 5 6 !]
+      - {click: '@', width: 9}
+      - {click: '(', width: 9}
+      - {click: ')', width: 9}
+      - {click: '=', width: 9}
+      - {click: '+', width: 9}
+      - {width: 10}
+      - {click: '4', width: 11.25}
+      - {click: '5', width: 11.25}
+      - {click: '6', width: 11.25}
+      - {click: '！', width: 11.25}
+      # R3 左[更多 : ; % /] 右[7 8 9 ⌫]
+      - {click: Keyboard_symbol_more, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: ':', width: 9}
+      - {click: ';', width: 9}
+      - {click: '%', width: 9}
+      - {click: '/', width: 9}
+      - {width: 10}
+      - {click: '7', width: 11.25}
+      - {click: '8', width: 11.25}
+      - {click: '9', width: 11.25}
+      - {click: BackSpace, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # R4 左[返回 。 空白 *] 右[, 0 . ⏎]
+      - {click: Keyboard_zhuyin_back, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '。', width: 9}
+      - {click: space, width: 18}
+      - {click: '*', width: 9}
+      - {width: 10}
+      - {click: ',', width: 11.25}
+      - {click: '0', width: 11.25}
+      - {click: '.', width: 11.25}
+      - {click: Return, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
 # emoji 面板（liquid keyboard）：底排 😀 鍵開啟，「返回」tab 回主鍵盤
 liquid_keyboard:
