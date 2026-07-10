@@ -214,6 +214,9 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
   private int mTrackpadLastX;
   private int mTrackpadRemainderX;
   private int mTrackpadStepPx;
+  private int mTrackpadLastY;
+  private int mTrackpadRemainderY;
+  private int mTrackpadStepPyPx;
 
   private static final int MAX_NEARBY_KEYS = 12;
   private final int[] mDistances = new int[MAX_NEARBY_KEYS];
@@ -1136,7 +1139,15 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
         Timber.d(
             "\t<TrimeInput>\tdetectAndSendKey()\tModifierKey, key.getEvent, KeyLabel=%s",
             key.getLabel());
-        setModifier(key);
+        if (key.isShift()
+            && !key.isOn()
+            && index == mLastSentIndex
+            && eventTime - mLastTapTime < ViewConfiguration.getDoubleTapTimeout()) {
+          // 雙擊 shift＝caps lock 鎖定（iOS 行為），再點一下解除
+          setShifted(true, true);
+        } else {
+          setModifier(key);
+        }
       } else {
         if (key.getClick().isRepeatable()) {
           if (type.ordinal() > KeyEventType.CLICK.ordinal()) mAbortKey = true;
@@ -1383,6 +1394,9 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     mTrackpadLastX = mLastX;
     mTrackpadRemainderX = 0;
     mTrackpadStepPx = computeTrackpadStepPx();
+    mTrackpadLastY = mLastY;
+    mTrackpadRemainderY = 0;
+    mTrackpadStepPyPx = computeTrackpadStepPyPx();
     mHandler.removeMessages(MSG_REPEAT);
     showPreview(NOT_A_KEY);
     // 重繪讓鍵帽文字消失（onBufferDraw 依 mSpaceTrackpad 跳過文字）
@@ -1407,6 +1421,17 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
     if (normal == Integer.MAX_VALUE) normal = getWidth() / 10;
     final float density = getResources().getDisplayMetrics().density;
     return Math.max((int) (12 * density), Math.min((int) (32 * density), normal / 2));
+  }
+
+  /** 垂直拖多遠移一行：普通鍵高，夾在 24~56dp 之間（一行一格，避免誤觸太靈敏） */
+  private int computeTrackpadStepPyPx() {
+    int normal = Integer.MAX_VALUE;
+    for (Key k : mKeys) {
+      if (k.isPreviewable()) normal = Math.min(normal, k.getHeight());
+    }
+    if (normal == Integer.MAX_VALUE) normal = getHeight() / 4;
+    final float density = getResources().getDisplayMetrics().density;
+    return Math.max((int) (24 * density), Math.min((int) (56 * density), normal));
   }
 
   /**
@@ -1659,6 +1684,18 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
             for (int i = 0; i < steps; i++) mKeyboardActionListener.onKey(code, 0);
           }
           mTrackpadRemainderX -= (right ? 1 : -1) * steps * mTrackpadStepPx;
+        }
+        // 垂直拖曳＝上下行移動（組字中 preedit 只有一行，忽略）
+        mTrackpadRemainderY += touchY - mTrackpadLastY;
+        mTrackpadLastY = touchY;
+        int stepsY = Math.min(Math.abs(mTrackpadRemainderY) / mTrackpadStepPyPx, 6);
+        if (stepsY > 0) {
+          final boolean down = mTrackpadRemainderY > 0;
+          if (!Rime.isComposing()) {
+            final int code = down ? KeyEvent.KEYCODE_DPAD_DOWN : KeyEvent.KEYCODE_DPAD_UP;
+            for (int i = 0; i < stepsY; i++) mKeyboardActionListener.onKey(code, 0);
+          }
+          mTrackpadRemainderY -= (down ? 1 : -1) * stepsY * mTrackpadStepPyPx;
         }
       } else if (action == MotionEvent.ACTION_UP
           || action == MotionEvent.ACTION_POINTER_UP

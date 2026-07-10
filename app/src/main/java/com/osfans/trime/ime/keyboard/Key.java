@@ -572,6 +572,8 @@ public class Key {
   }
 
   public String getLabel() {
+    // caps lock（雙擊 shift 鎖定）態鍵帽顯示 ⇪（iOS 樣式）
+    if (isShift() && isOn()) return "⇪";
     Event event = getEvent();
     // 沒定義 ascii 事件的鍵（注音鍵）任何模式都顯示鍵面標籤：click 是大千碼（ㄅ=1），
     // 英數殘留態下若 fallback 到 event.getLabel() 整片鍵帽會變成 1qaz2wsx
