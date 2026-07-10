@@ -2,13 +2,10 @@
 patch:
   # 預設中文（上游 reset: 1 是英數）
   "switches/@0/reset": 0
-  # 空白鍵改「送出第一候選」（比照 iPhone）：
-  # 拿掉 use_space 與 alphabet/finals 中的空白，並把整句式 fluency_editor 換成
-  # 即選即上的 express_editor，空白按下直接 commit 第一候選到輸入框。
-  # 副作用：明打一聲（空白）失效，靠 schema 既有免聲調 abbrev 規則出字（規格接受）。
-  "speller/use_space": false
-  "speller/finals": "6347"
-  "speller/alphabet": "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347"
+  # 空白鍵＝一聲（2026-07-11 撤銷早期「空白送首選」patch）：
+  # 上游 schema 原生 use_space: true、alphabet/finals 含空格，空白進 speller 當
+  # 一聲字根，否則一聲字打不出來。選字確認改用點候選或 Enter（Trime 層攔截）。
+  # editor 仍用 express_editor：空白被 speller 先吃，editor 摸不到空白鍵。
   # 手機用點候選列選字，關掉數字鍵選字（否則大千 ㄚㄞㄢ 等在數字鍵位會被當選字鍵）
   "menu/alternative_select_keys": ""
   "engine/processors":
