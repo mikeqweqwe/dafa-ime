@@ -1143,8 +1143,10 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
             && !key.isOn()
             && index == mLastSentIndex
             && eventTime - mLastTapTime < ViewConfiguration.getDoubleTapTimeout()) {
-          // 雙擊 shift＝caps lock 鎖定（iOS 行為），再點一下解除
+          // 雙擊 shift＝caps lock 鎖定（iOS 行為），再點一下解除。
+          // 第一擊已設 META_SHIFT_ON，setShifted 會因狀態未變回 false，須強制重繪出 ⇪
           setShifted(true, true);
+          invalidateAllKeys();
         } else {
           setModifier(key);
         }

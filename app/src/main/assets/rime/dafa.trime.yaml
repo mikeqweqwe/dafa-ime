@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.21"
+config_version: "3.22"
 name: dafa
 author: Hau Liu
 
@@ -229,6 +229,8 @@ preset_keys:
   Keyboard_english_back: {label: 返回, functional: false, send: Eisu_toggle, select: english}
   # symbol（更多）頁的 123：回進來前那頁（number 或 number_en）
   Keyboard_number_last: {label: 123, functional: false, send: Eisu_toggle, select: .last}
+  # symbol 頁左下：回最後鎖定的主鍵盤（注音流程回 zhuyin、英文流程回 english）
+  Keyboard_back_main: {label: 返回, functional: false, send: Eisu_toggle, select: .last_lock}
   Slash_commit: {label: '/', functional: false, commit: '/'}
   liquid_keyboard_emoji: {label: "😀", send: function, command: liquid_keyboard, option: emoji}
 
@@ -237,6 +239,8 @@ preset_keyboards:
     name: 注音鍵盤（收合）
     author: Hau Liu
     ascii_mode: 0
+    # 密碼/email 欄位強制 .ascii 時切到英文佈局，不留在注音鍵帽上打英數
+    ascii_keyboard: english
     width: 10
     height: 48
     lock: true
@@ -502,8 +506,8 @@ preset_keyboards:
       - {click: "'", width: 14.3}
       - {click: BackSpace, width: 14.2, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
-      # 第4排：注音（切回zhuyin） / 空白 / Enter
-      - {click: Keyboard_zhuyin, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # 第4排：返回（注音流程回 zhuyin、英文流程回 english） / 空白 / Enter
+      - {click: Keyboard_back_main, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: space, width: 64}
       - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
@@ -559,6 +563,8 @@ preset_keyboards:
     name: 注音分離鍵盤
     author: dafa
     ascii_mode: 0
+    # .ascii 目標填 english 即可，landRemap 會自動換成 english_land
+    ascii_keyboard: english
     lock: true
     width: 7.2
     height: 44

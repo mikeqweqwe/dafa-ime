@@ -205,9 +205,10 @@ class TextInputManager private constructor() :
                             if (keyboardSwitcher.keyboardNames.contains("phonepad")) "phonepad" else "number"
                         }
                         InputType.TYPE_CLASS_DATETIME -> {
-                            // 日期時間需要 : / - 分隔符，九宮格放不下 → 用數字符號頁
+                            // 日期時間需要半形 : / - 分隔符，九宮格放不下 → 用英文數字符號頁
+                            // （number 頁是注音全形標點，全形分隔符會被欄位驗證拒絕）
                             tempAsciiMode = true
-                            "number"
+                            if (keyboardSwitcher.keyboardNames.contains("number_en")) "number_en" else "number"
                         }
                         InputType.TYPE_CLASS_TEXT -> {
                             when (inputAttrsRaw and InputType.TYPE_MASK_VARIATION) {
