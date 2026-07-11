@@ -28,6 +28,12 @@
     <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- targetSdk 30+ 綁定語音辨識服務需要可見性聲明；29 無害，先備妥 -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
     <application
         android:name="com.osfans.trime.TrimeApplication"
         android:label="@string/trime_app_name"

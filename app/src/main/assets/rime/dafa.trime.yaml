@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.23"
+config_version: "3.24"
 name: dafa
 author: Hau Liu
 
@@ -59,7 +59,7 @@ style:
   key_long_text_size: 16
   key_text_size: 20
   key_width: 10.0
-  keyboards: [zhuyin, english, number, number_en, symbol, numpad, phonepad, zhuyin_land, english_land, number_land, number_en_land, symbol_land]
+  keyboards: [zhuyin, english, number, number_en, symbol, symbol_en, numpad, phonepad, zhuyin_land, english_land, number_land, number_en_land, symbol_land, symbol_en_land]
   label_text_size: 20
   label_font: label.ttf
   latin_font: latin.ttf
@@ -223,6 +223,8 @@ preset_keys:
   Keyboard_zhuyin_back: {label: 返回, functional: false, send: Eisu_toggle, select: zhuyin}
   Keyboard_zhuyin_globe: {label: "🌐", functional: false, send: Eisu_toggle, select: zhuyin}
   Keyboard_symbol_more: {label: 更多, functional: false, send: Eisu_toggle, select: symbol}
+  # 英文流程的更多：直屏落 symbol_en（影子頁）、展開由 landRemap 換 symbol_en_land
+  Keyboard_symbol_more_en: {label: 更多, functional: false, send: Eisu_toggle, select: symbol_en}
   # 英文模式專用數字符號頁（半形），與注音進的 number（全形）分流
   Keyboard_number_en: {label: 123, functional: false, send: Eisu_toggle, select: number_en}
   Keyboard_number2_en: {label: "!#1", functional: false, send: Eisu_toggle, select: number_en}
@@ -235,6 +237,8 @@ preset_keys:
   Slash_commit: {label: '/', functional: false, commit: '/'}
   # 全形逗號直接上屏（不經 RIME，組字中不干擾）
   Comma_commit: {label: '，', functional: false, commit: '，'}
+  Apostrophe_commit: {label: "'", functional: false, commit: "'"}
+  DotCom_commit: {label: ".com", functional: false, commit: ".com"}
   liquid_keyboard_emoji: {label: "😀", send: function, command: liquid_keyboard, option: emoji}
 
 preset_keyboards:
@@ -261,46 +265,46 @@ preset_keyboards:
       - {label: 'ㄢ', click: '0', width: 9.09}
       - {label: 'ㄦ', click: '-', width: 9.1}
 
-      # 第2排：腰身留邊5，ㄆㄊㄍㄐㄔㄗㄧㄛㄟㄣ（10鍵）
+      # 第2排：腰身留邊2.5，ㄆㄊㄍㄐㄔㄗㄧㄛㄟㄣ（10鍵）
+      - {width: 2.5}
+      - {label: 'ㄆ', click: q, width: 9.5}
+      - {label: 'ㄊ', click: w, width: 9.5}
+      - {label: 'ㄍ', click: e, width: 9.5}
+      - {label: 'ㄐ', click: r, width: 9.5}
+      - {label: 'ㄔ', click: t, width: 9.5}
+      - {label: 'ㄗ', click: y, width: 9.5}
+      - {label: 'ㄧ', click: u, width: 9.5}
+      - {label: 'ㄛ', click: i, width: 9.5}
+      - {label: 'ㄟ', click: o, width: 9.5}
+      - {label: 'ㄣ', click: p, width: 9.5}
+      - {width: 2.5}
+
+      # 第3排：腰身留邊5，ㄇㄋㄎㄑㄕㄘㄨㄜㄠㄤ（10鍵）
       - {width: 5}
-      - {label: 'ㄆ', click: q, width: 9}
-      - {label: 'ㄊ', click: w, width: 9}
-      - {label: 'ㄍ', click: e, width: 9}
-      - {label: 'ㄐ', click: r, width: 9}
-      - {label: 'ㄔ', click: t, width: 9}
-      - {label: 'ㄗ', click: y, width: 9}
-      - {label: 'ㄧ', click: u, width: 9}
-      - {label: 'ㄛ', click: i, width: 9}
-      - {label: 'ㄟ', click: o, width: 9}
-      - {label: 'ㄣ', click: p, width: 9}
+      - {label: 'ㄇ', click: a, width: 9}
+      - {label: 'ㄋ', click: s, width: 9}
+      - {label: 'ㄎ', click: d, width: 9}
+      - {label: 'ㄑ', click: f, width: 9}
+      - {label: 'ㄕ', click: g, width: 9}
+      - {label: 'ㄘ', click: h, width: 9}
+      - {label: 'ㄨ', click: j, width: 9}
+      - {label: 'ㄜ', click: k, width: 9}
+      - {label: 'ㄠ', click: l, width: 9}
+      - {label: 'ㄤ', click: ';', width: 9}
       - {width: 5}
 
-      # 第3排：腰身留邊7.5，ㄇㄋㄎㄑㄕㄘㄨㄜㄠㄤ（10鍵）
-      - {width: 7.5}
-      - {label: 'ㄇ', click: a, width: 8.5}
-      - {label: 'ㄋ', click: s, width: 8.5}
-      - {label: 'ㄎ', click: d, width: 8.5}
-      - {label: 'ㄑ', click: f, width: 8.5}
-      - {label: 'ㄕ', click: g, width: 8.5}
-      - {label: 'ㄘ', click: h, width: 8.5}
-      - {label: 'ㄨ', click: j, width: 8.5}
-      - {label: 'ㄜ', click: k, width: 8.5}
-      - {label: 'ㄠ', click: l, width: 8.5}
-      - {label: 'ㄤ', click: ';', width: 8.5}
-      - {width: 7.5}
-
-      # 第4排：ㄈㄌㄏㄒㄖㄙㄩㄝㄡㄥ＋⌫（⌫ 縮窄防誤觸）
-      - {label: 'ㄈ', click: z, width: 8.8}
-      - {label: 'ㄌ', click: x, width: 8.8}
-      - {label: 'ㄏ', click: c, width: 8.8}
-      - {label: 'ㄒ', click: v, width: 8.8}
-      - {label: 'ㄖ', click: b, width: 8.8}
-      - {label: 'ㄙ', click: n, width: 8.8}
-      - {label: 'ㄩ', click: m, width: 8.8}
-      - {label: 'ㄝ', click: ',', width: 8.8}
-      - {label: 'ㄡ', click: '.', width: 8.8}
-      - {label: 'ㄥ', click: '/', width: 8.8}
-      - {click: BackSpace, width: 12, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # 第4排：ㄈㄌㄏㄒㄖㄙㄩㄝㄡㄥ＋⌫（⌫=10 同字根寬防誤觸）
+      - {label: 'ㄈ', click: z, width: 9}
+      - {label: 'ㄌ', click: x, width: 9}
+      - {label: 'ㄏ', click: c, width: 9}
+      - {label: 'ㄒ', click: v, width: 9}
+      - {label: 'ㄖ', click: b, width: 9}
+      - {label: 'ㄙ', click: n, width: 9}
+      - {label: 'ㄩ', click: m, width: 9}
+      - {label: 'ㄝ', click: ',', width: 9}
+      - {label: 'ㄡ', click: '.', width: 9}
+      - {label: 'ㄥ', click: '/', width: 9}
+      - {click: BackSpace, width: 10, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
       # 第5排：123 / 😀 / 空白（注 hint） / Enter——對齊 iOS 底排；#+= 走 123 進符號頁
       - {click: Keyboard_number, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
@@ -347,7 +351,7 @@ preset_keyboards:
       - {width: 5}
 
       # 第3排：⇧ + ZXCVBNM + ⌫
-      - {click: Shift_L, width: 15, key_text_size: 30, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Shift_L, width: 15, key_text_size: 26, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: z, width: 10}
       - {click: x, width: 10}
       - {click: c, width: 10}
@@ -519,6 +523,57 @@ preset_keyboards:
       - {width: 70, height: 26}
       - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
 
+  # 英文流程「更多」的直屏影子頁（內容同 symbol；主要作為 symbol_en_land 的摺疊 fallback）
+  symbol_en:
+    name: 符號鍵盤（#+= 英文）
+    author: Hau Liu
+    ascii_mode: 1
+    width: 10
+    height: 48
+    keys:
+      # 第1排：[ ] { } # % ^ * + =（半形，iOS 第二符號頁）
+      - {click: '[', width: 10}
+      - {click: ']', width: 10}
+      - {click: '{', width: 10}
+      - {click: '}', width: 10}
+      - {click: '#', width: 10}
+      - {click: '%', width: 10}
+      - {click: '^', width: 10}
+      - {click: '*', width: 10}
+      - {click: '+', width: 10}
+      - {click: '=', width: 10}
+
+      # 第2排：_ — \ | ~ « » 「」 & ·（¥ 依需求換成「」上下引號）
+      - {click: '_', width: 10}
+      - {click: '—', width: 10}
+      - {click: '\', width: 10}
+      - {click: '|', width: 10}
+      - {click: '~', width: 10}
+      - {click: '«', width: 10}
+      - {click: '»', width: 10}
+      - {click: '「」', width: 10}
+      - {click: '&', width: 10}
+      - {click: '·', width: 10}
+
+      # 第3排：123（回進來前的數字頁）／半形 . , ? ! ' ／⌫
+      - {click: Keyboard_number_last, width: 14.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '.', width: 14.3}
+      - {click: ',', width: 14.3}
+      - {click: '?', width: 14.3}
+      - {click: '!', width: 14.3}
+      - {click: "'", width: 14.3}
+      - {click: BackSpace, width: 14.2, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+      # 第4排：返回（注音流程回 zhuyin、英文流程回 english） / 空白 / Enter
+      - {click: Keyboard_back_main, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space, width: 64}
+      - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+      # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
+      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
+      - {width: 70, height: 26}
+      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
+
   # 純數字欄位（TYPE_CLASS_NUMBER/DATETIME 由 TextInputManager 自動切入）——iOS numberPad 3x4
   numpad:
     name: 數字九宮格
@@ -629,7 +684,7 @@ preset_keyboards:
       # R5 左[!#1 🌐 ， 空白] 右[空白 。 123 前往]
       - {click: Keyboard_number2, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: Keyboard_english, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: Comma_commit, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Comma_commit, width: 7.5}
       - {click: space, width: 21}
       - {width: 10}
       - {click: space, width: 21}
@@ -683,7 +738,7 @@ preset_keyboards:
       - {click: l, width: 7.2}
       - {width: 6.8}
       # R4 左[⇧ zxcv] 右[bnm ⌫]
-      - {click: Shift_L, width: 9, key_text_size: 30, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Shift_L, width: 9, key_text_size: 26, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: z, width: 7.2}
       - {click: x, width: 7.2}
       - {click: c, width: 7.2}
@@ -693,15 +748,15 @@ preset_keyboards:
       - {click: n, width: 7.2}
       - {click: m, width: 7.2}
       - {click: BackSpace, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      # R5 左[!#1 🌐 / 空白] 右[空白 . 123 前往]（英文模式進半形數字頁）
+      # R5 左[!#1 🌐 ' 空白] 右[空白 . .com 前往]（英文模式進半形數字頁）
       - {click: Keyboard_number2_en, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: Keyboard_zhuyin_globe, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: Slash_commit, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Apostrophe_commit, width: 7.5}
       - {click: space, width: 21}
       - {width: 10}
       - {click: space, width: 21}
       - {click: '.', width: 7.5}
-      - {click: Keyboard_number_en, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: DotCom_commit, width: 7.5, key_text_size: 14}
       - {click: Return, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
   number_land:
@@ -722,10 +777,10 @@ preset_keyboards:
       - {click: '2', width: 11.25}
       - {click: '3', width: 11.25}
       - {click: '？', width: 11.25}
-      # R2 左[＠（）＄＆] 右[4 5 6 ！]
+      # R2 左[＠ ＃ （） ＄ ＆] 右[4 5 6 ！]（（）一鍵成對）
       - {click: '＠', width: 9}
-      - {click: '（', width: 9}
-      - {click: '）', width: 9}
+      - {click: '＃', width: 9}
+      - {click: '（）', width: 9}
       - {click: '＄', width: 9}
       - {click: '＆', width: 9}
       - {width: 10}
@@ -733,12 +788,12 @@ preset_keyboards:
       - {click: '5', width: 11.25}
       - {click: '6', width: 11.25}
       - {click: '！', width: 11.25}
-      # R3 左[更多 ：；％／] 右[7 8 9 ⌫]
+      # R3 左[更多 、：；％] 右[7 8 9 ⌫]
       - {click: Keyboard_symbol_more, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '、', width: 9}
       - {click: '：', width: 9}
       - {click: '；', width: 9}
       - {click: '％', width: 9}
-      - {click: '／', width: 9}
       - {width: 10}
       - {click: '7', width: 11.25}
       - {click: '8', width: 11.25}
@@ -756,45 +811,91 @@ preset_keyboards:
       - {click: Return, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
   symbol_land:
-    name: 符號分離鍵盤（更多）
+    name: 符號分離鍵盤（更多，注音全形）
     author: dafa
     ascii_mode: 1
     width: 9
     height: 55
     keys:
-      # R1 左[[ ] { } #] 右[% ^ * + =]
+      # R1 左[[ ] { } ～] 右[⌃ ⌵ ＊ ※ ．]
       - {click: '[', width: 9}
       - {click: ']', width: 9}
       - {click: '{', width: 9}
       - {click: '}', width: 9}
-      - {click: '#', width: 9}
+      - {click: '～', width: 9}
       - {width: 10}
-      - {click: '%', width: 9}
-      - {click: '^', width: 9}
-      - {click: '*', width: 9}
-      - {click: '+', width: 9}
-      - {click: '=', width: 9}
-      # R2 左[_ — \ | ~] 右[« » 「」 & ·]
-      - {click: '_', width: 9}
+      - {click: '⌃', width: 9}
+      - {click: '⌵', width: 9}
+      - {click: '＊', width: 9}
+      - {click: '※', width: 9}
+      - {click: '．', width: 9}
+      # R2 左[＿ — ／ ｜ ＼] 右[＜＞ 《》 「」]（成對鍵一鍵出雙）
+      - {click: '＿', width: 9}
       - {click: '—', width: 9}
-      - {click: '\', width: 9}
-      - {click: '|', width: 9}
+      - {click: '／', width: 9}
+      - {click: '｜', width: 9}
+      - {click: '＼', width: 9}
+      - {width: 10}
+      - {click: '＜＞', width: 15}
+      - {click: '《》', width: 15}
+      - {click: '「」', width: 15}
+      # R3 左[123 ● ■ ★ ➜] 右[⌘ ✔ ✖ ⌫]
+      - {click: Keyboard_number_last, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '●', width: 9}
+      - {click: '■', width: 9}
+      - {click: '★', width: 9}
+      - {click: '➜', width: 9}
+      - {width: 10}
+      - {click: '⌘', width: 11.25}
+      - {click: '✔', width: 11.25}
+      - {click: '✖', width: 11.25}
+      - {click: BackSpace, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # R4 左[返回 空白] 右[空白 ⏎]
+      - {click: Keyboard_back_main, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: space, width: 36}
+      - {width: 10}
+      - {click: space, width: 33.75}
+      - {click: Return, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+
+  symbol_en_land:
+    name: 符號分離鍵盤（更多，英文半形）
+    author: dafa
+    ascii_mode: 1
+    width: 9
+    height: 55
+    keys:
+      # R1 左[[ ] { } ~] 右[⌃ ⌵ * ※ .]
+      - {click: '[', width: 9}
+      - {click: ']', width: 9}
+      - {click: '{', width: 9}
+      - {click: '}', width: 9}
       - {click: '~', width: 9}
       - {width: 10}
-      - {click: '«', width: 9}
-      - {click: '»', width: 9}
-      - {click: '「」', width: 9}
-      - {click: '&', width: 9}
-      - {click: '·', width: 9}
-      # R3 左[123 . , ? !] 右[' ⌫]（靠右）
-      - {click: Keyboard_number_last, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '⌃', width: 9}
+      - {click: '⌵', width: 9}
+      - {click: '*', width: 9}
+      - {click: '※', width: 9}
       - {click: '.', width: 9}
-      - {click: ',', width: 9}
-      - {click: '?', width: 9}
-      - {click: '!', width: 9}
+      # R2 左[_ — / | \] 右[<> 《》 「」]
+      - {click: '_', width: 9}
+      - {click: '—', width: 9}
+      - {click: '/', width: 9}
+      - {click: '|', width: 9}
+      - {click: '\', width: 9}
       - {width: 10}
-      - {width: 22.5}
-      - {click: "'", width: 11.25}
+      - {click: '<>', width: 15}
+      - {click: '《》', width: 15}
+      - {click: '「」', width: 15}
+      # R3 左[123 ● ■ ★ ➜] 右[⌘ ✔ ✖ ⌫]
+      - {click: Keyboard_number_last, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: '●', width: 9}
+      - {click: '■', width: 9}
+      - {click: '★', width: 9}
+      - {click: '➜', width: 9}
+      - {width: 10}
+      - {click: '⌘', width: 11.25}
+      - {click: '✔', width: 11.25}
+      - {click: '✖', width: 11.25}
       - {click: BackSpace, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       # R4 左[返回 空白] 右[空白 ⏎]
       - {click: Keyboard_back_main, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
@@ -821,10 +922,10 @@ preset_keyboards:
       - {click: '2', width: 11.25}
       - {click: '3', width: 11.25}
       - {click: '?', width: 11.25}
-      # R2 左[@ ( ) $ &] 右[4 5 6 !]
+      # R2 左[@ # () $ &] 右[4 5 6 !]（()一鍵成對）
       - {click: '@', width: 9}
-      - {click: '(', width: 9}
-      - {click: ')', width: 9}
+      - {click: '#', width: 9}
+      - {click: '()', width: 9}
       - {click: '$', width: 9}
       - {click: '&', width: 9}
       - {width: 10}
@@ -832,12 +933,12 @@ preset_keyboards:
       - {click: '5', width: 11.25}
       - {click: '6', width: 11.25}
       - {click: '!', width: 11.25}
-      # R3 左[更多 : ; % /] 右[7 8 9 ⌫]
-      - {click: Keyboard_symbol_more, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      # R3 左[更多 , : ; %] 右[7 8 9 ⌫]
+      - {click: Keyboard_symbol_more_en, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: ',', width: 9}
       - {click: ':', width: 9}
       - {click: ';', width: 9}
       - {click: '%', width: 9}
-      - {click: '/', width: 9}
       - {width: 10}
       - {click: '7', width: 11.25}
       - {click: '8', width: 11.25}

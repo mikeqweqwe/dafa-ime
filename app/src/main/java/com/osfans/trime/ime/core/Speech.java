@@ -54,6 +54,22 @@ public class Speech implements RecognitionListener {
   }
 
   public void startListening() {
+    // RECORD_AUDIO 是 runtime 權限，IME 無法自行彈授權框：缺權限時導去 App 設定頁
+    if (context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+      ToastUtils.showLong("請授予「麥克風」權限後再使用聽寫");
+      final Intent intent =
+          new Intent(
+              android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+              android.net.Uri.parse("package:" + context.getPackageName()));
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      context.startActivity(intent);
+      return;
+    }
+    if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+      ToastUtils.showShort("此裝置沒有可用的語音辨識服務");
+      return;
+    }
     if (speechRecognizer != null) speechRecognizer.startListening(recognizerIntent);
   }
 
