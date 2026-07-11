@@ -10,7 +10,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 20260739
-        versionName "3.2.7-dafa.42"
+        versionName "3.2.7-dafa.43"
         setProperty("archivesBaseName", "dafa-$versionName")
         resValue "string", "trime_url", getGitUrl()
         buildConfigField 'String', 'BUILD_INFO' , '"' + getBuildInfo() + '"'
