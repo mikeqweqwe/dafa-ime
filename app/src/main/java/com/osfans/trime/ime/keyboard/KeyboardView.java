@@ -1001,6 +1001,9 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
         }
         // Draw a drop shadow for the text
         paint.setShadowLayer(mShadowRadius, 0, 0, mShadowColor);
+        // ⇧/⇪ 字元瘦長，橫向拉寬讓它矮胖（對齊 iOS shift 鍵形狀）
+        final boolean isShiftGlyph = key.isShift() && label.length() == 1;
+        if (isShiftGlyph) paint.setTextScaleX(1.5f);
         // Draw the text
         canvas.drawText(
             label,
@@ -1010,6 +1013,7 @@ public class KeyboardView extends View implements View.OnClickListener, Coroutin
                 + top
                 + key.getKey_text_offset_y(),
             paint);
+        if (isShiftGlyph) paint.setTextScaleX(1.0f);
         if (mShowSymbol) {
           String labelSymbol = key.getSymbolLabel();
           if (!TextUtils.isEmpty(labelSymbol)) {

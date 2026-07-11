@@ -1064,6 +1064,9 @@ public class Trime extends LifecycleInputMethodService {
     }
   }
 
+  // 雙擊空白偵測（非組字時連擊兩下空白＝句號）
+  private long lastSpaceTapTime = 0;
+
   // 处理键盘事件(Android keycode)
   public boolean handleKey(int keyEventCode, int metaState) { // 軟鍵盤
     textInputManager.setNeedSendUpRimeKey(false);
@@ -1081,6 +1084,27 @@ public class Trime extends LifecycleInputMethodService {
       Rime.commitComposition();
       activeEditorInstance.commitRimeText();
       return true;
+    }
+    // 非組字時 350ms 內連擊兩下空白＝句號（iOS 慣例）：撤回第一擊上屏的空格，
+    // 改上屏中文全形「。」／英文半形「.」。組字中空白＝一聲字根，不參與偵測。
+    if (keyEventCode == KeyEvent.KEYCODE_SPACE
+        && (metaState & chordMask) == 0
+        && !Rime.isComposing()) {
+      final long now = System.currentTimeMillis();
+      final long sinceLast = now - lastSpaceTapTime;
+      lastSpaceTapTime = now;
+      if (sinceLast < 350) {
+        final InputConnection ic = getCurrentInputConnection();
+        final CharSequence before = ic != null ? ic.getTextBeforeCursor(1, 0) : null;
+        if (before != null
+            && before.length() == 1
+            && (before.charAt(0) == ' ' || before.charAt(0) == '　')) {
+          lastSpaceTapTime = 0;
+          ic.deleteSurroundingText(1, 0);
+          ic.commitText(Rime.isAsciiMode() ? "." : "。", 1);
+          return true;
+        }
+      }
     }
     if (onRimeKey(Event.getRimeEvent(keyEventCode, metaState))) {
       // 如果输入法消费了按键事件，则需要释放按键

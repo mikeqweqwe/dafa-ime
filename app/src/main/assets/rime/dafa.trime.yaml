@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.24"
+config_version: "3.25"
 name: dafa
 author: Hau Liu
 
@@ -237,6 +237,7 @@ preset_keys:
   Slash_commit: {label: '/', functional: false, commit: '/'}
   # 全形逗號直接上屏（不經 RIME，組字中不干擾）
   Comma_commit: {label: '，', functional: false, commit: '，'}
+  Dun_commit: {label: '、', functional: false, commit: '、'}
   Apostrophe_commit: {label: "'", functional: false, commit: "'"}
   DotCom_commit: {label: ".com", functional: false, commit: ".com"}
   liquid_keyboard_emoji: {label: "😀", send: function, command: liquid_keyboard, option: emoji}
@@ -681,15 +682,15 @@ preset_keyboards:
       - {label: 'ㄡ', click: '.', width: 7.2}
       - {label: 'ㄥ', click: '/', width: 7.2}
       - {click: BackSpace, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      # R5 左[!#1 🌐 ， 空白] 右[空白 。 123 前往]
+      # R5 左[!#1 🌐 、 空白] 右[空白 ， 🎙 前往]（123 頁走 !#1；句號用雙擊空白）
       - {click: Keyboard_number2, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: Keyboard_english, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: Comma_commit, width: 7.5}
+      - {click: Dun_commit, width: 7.5}
       - {click: space, width: 21}
       - {width: 10}
       - {click: space, width: 21}
-      - {click: '。', width: 7.5}
-      - {click: Keyboard_number, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
+      - {click: Comma_commit, width: 7.5}
+      - {click: Mic_placeholder, width: 7.5, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
       - {click: Return, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
   english_land:
@@ -755,7 +756,7 @@ preset_keyboards:
       - {click: space, width: 21}
       - {width: 10}
       - {click: space, width: 21}
-      - {click: '.', width: 7.5}
+      - {click: ',', width: 7.5}
       - {click: DotCom_commit, width: 7.5, key_text_size: 14}
       - {click: Return, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
 
@@ -824,11 +825,11 @@ preset_keyboards:
       - {click: '}', width: 9}
       - {click: '～', width: 9}
       - {width: 10}
-      - {click: '⌃', width: 9}
-      - {click: '⌵', width: 9}
-      - {click: '＊', width: 9}
+      - {click: '＾', width: 9}
+      - {click: '…', width: 9}
+      - {click: '✱', width: 9, key_text_offset_y: 4}
       - {click: '※', width: 9}
-      - {click: '．', width: 9}
+      - {click: '•', width: 9}
       # R2 左[＿ — ／ ｜ ＼] 右[＜＞ 《》 「」]（成對鍵一鍵出雙）
       - {click: '＿', width: 9}
       - {click: '—', width: 9}
@@ -871,11 +872,11 @@ preset_keyboards:
       - {click: '}', width: 9}
       - {click: '~', width: 9}
       - {width: 10}
-      - {click: '⌃', width: 9}
-      - {click: '⌵', width: 9}
-      - {click: '*', width: 9}
+      - {click: '＾', width: 9}
+      - {click: '…', width: 9}
+      - {click: '✱', width: 9, key_text_offset_y: 4}
       - {click: '※', width: 9}
-      - {click: '.', width: 9}
+      - {click: '•', width: 9}
       # R2 左[_ — / | \] 右[<> 《》 「」]
       - {click: '_', width: 9}
       - {click: '—', width: 9}
@@ -933,9 +934,9 @@ preset_keyboards:
       - {click: '5', width: 11.25}
       - {click: '6', width: 11.25}
       - {click: '!', width: 11.25}
-      # R3 左[更多 , : ; %] 右[7 8 9 ⌫]
+      # R3 左[更多 " : ; %] 右[7 8 9 ⌫]
       - {click: Keyboard_symbol_more_en, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: ',', width: 9}
+      - {click: '"', width: 9}
       - {click: ':', width: 9}
       - {click: ';', width: 9}
       - {click: '%', width: 9}
@@ -944,9 +945,9 @@ preset_keyboards:
       - {click: '8', width: 11.25}
       - {click: '9', width: 11.25}
       - {click: BackSpace, width: 11.25, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      # R4 左[返回 . 空白 *] 右[, 0 . ⏎]
+      # R4 左[返回 、 空白 *] 右[, 0 . ⏎]
       - {click: Keyboard_english_back, width: 9, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: '.', width: 9}
+      - {click: '、', width: 9}
       - {click: space, width: 18}
       - {click: '*', width: 9}
       - {width: 10}
