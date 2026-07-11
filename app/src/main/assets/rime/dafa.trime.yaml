@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.25"
+config_version: "3.26"
 name: dafa
 author: Hau Liu
 
@@ -524,57 +524,12 @@ preset_keyboards:
       - {width: 70, height: 26}
       - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
 
-  # 英文流程「更多」的直屏影子頁（內容同 symbol；主要作為 symbol_en_land 的摺疊 fallback）
+  # 英文流程「更多」的直屏頁：內容同 symbol（__include 部署時展開，免手動同步）。
+  # 僅差矮排地球=切回注音（英文流程慣例）。注意：摺疊/展開切換會 newOrReset 重置回
+  # 主頁，此頁實際只在直屏英文流程可達
   symbol_en:
+    __include: /preset_keyboards/symbol
     name: 符號鍵盤（#+= 英文）
-    author: Hau Liu
-    ascii_mode: 1
-    width: 10
-    height: 48
-    keys:
-      # 第1排：[ ] { } # % ^ * + =（半形，iOS 第二符號頁）
-      - {click: '[', width: 10}
-      - {click: ']', width: 10}
-      - {click: '{', width: 10}
-      - {click: '}', width: 10}
-      - {click: '#', width: 10}
-      - {click: '%', width: 10}
-      - {click: '^', width: 10}
-      - {click: '*', width: 10}
-      - {click: '+', width: 10}
-      - {click: '=', width: 10}
-
-      # 第2排：_ — \ | ~ « » 「」 & ·（¥ 依需求換成「」上下引號）
-      - {click: '_', width: 10}
-      - {click: '—', width: 10}
-      - {click: '\', width: 10}
-      - {click: '|', width: 10}
-      - {click: '~', width: 10}
-      - {click: '«', width: 10}
-      - {click: '»', width: 10}
-      - {click: '「」', width: 10}
-      - {click: '&', width: 10}
-      - {click: '·', width: 10}
-
-      # 第3排：123（回進來前的數字頁）／半形 . , ? ! ' ／⌫
-      - {click: Keyboard_number_last, width: 14.3, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: '.', width: 14.3}
-      - {click: ',', width: 14.3}
-      - {click: '?', width: 14.3}
-      - {click: '!', width: 14.3}
-      - {click: "'", width: 14.3}
-      - {click: BackSpace, width: 14.2, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-
-      # 第4排：返回（注音流程回 zhuyin、英文流程回 english） / 空白 / Enter
-      - {click: Keyboard_back_main, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-      - {click: space, width: 64}
-      - {click: Return, width: 18, key_back_color: function_key_back_color, hilited_key_back_color: function_key_hilited_back_color}
-
-      # 第5排（矮排）：地球（切英文） …… 麥克風（占位）——與注音頁輪廓一致
-      - {click: Keyboard_english, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
-      - {width: 70, height: 26}
-      - {click: Mic_placeholder, height: 26, width: 15, key_back_color: keyboard_back_color, hilited_key_back_color: keyboard_back_color, round_corner: 0, key_shadow: false}
-
   # 純數字欄位（TYPE_CLASS_NUMBER/DATETIME 由 TextInputManager 自動切入）——iOS numberPad 3x4
   numpad:
     name: 數字九宮格
@@ -872,7 +827,7 @@ preset_keyboards:
       - {click: '}', width: 9}
       - {click: '~', width: 9}
       - {width: 10}
-      - {click: '＾', width: 9}
+      - {click: '^', width: 9}
       - {click: '…', width: 9}
       - {click: '✱', width: 9, key_text_offset_y: 4}
       - {click: '※', width: 9}

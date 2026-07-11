@@ -9,16 +9,11 @@ patch:
   # 手機用點候選列選字，關掉數字鍵選字（否則大千 ㄚㄞㄢ 等在數字鍵位會被當選字鍵）
   "menu/alternative_select_keys": ""
   # 打太快亂序時（如 ㄨ 比 ㄕ 先按到）上游 preedit 會顯示「(ㄕ+ㄨㄛ)」括號加號
-  # 標記校正——容錯保留，但顯示直接呈現校正後的正序注音，不加括號
-  "translator/preedit_format":
-    - 'xform|([ujm])([8ik,9ol.0p;/\-])([1qaz2wsxedcrfv5tgbyhn])|$3$1$2|'
-    - 'xform|([8ik,9ol.0p;/\-])([1qaz2wsxedcrfv5tgbyhn])([ujm])|$2$3$1|'
-    - 'xform|([8ik,9ol.0p;/\-])([ujm])([1qaz2wsxedcrfv5tgbyhn])|$3$2$1|'
-    - 'xform|([ujm])([1qaz2wsxedcrfv5tgbyhn])|$2$1|'
-    - 'xform|([8ik,9ol.0p;/\-])([ujm])|$2$1|'
-    - 'xform|([8ik,9ol.0p;/\-])([1qaz2wsxedcrfv5tgbyhn])|$2$1|'
-    - 'xform/\|/ /'
-    - "xlit|1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347|ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙|"
+  # 標記校正——容錯與上游規則照舊，只追加一條尾規則清掉標記字元
+  # （追加而非整段覆寫：上游更新 preedit_format 時自動跟隨；先前整段複製曾把
+  #  U+2002 音節分隔符抄成 ASCII 空格，被 xlit 誤轉成假一聲 ˉ）
+  "translator/preedit_format/+":
+    - xform/[()+]//
   "engine/processors":
     - ascii_composer
     - recognizer

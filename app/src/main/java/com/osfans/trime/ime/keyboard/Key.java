@@ -610,7 +610,8 @@ public class Key {
         || c == KeyEvent.KEYCODE_EISU
         || c == KeyEvent.KEYCODE_FUNCTION
         || c == KeyEvent.KEYCODE_SWITCH_CHARSET
-        || c == KeyEvent.KEYCODE_LANGUAGE_SWITCH) return false;
+        || c == KeyEvent.KEYCODE_LANGUAGE_SWITCH
+        || c == KeyEvent.KEYCODE_VOICE_ASSIST) return false;
     if (c > 0) return true; // 字母/數字/符號鍵碼
     // code=0 同時是 KEYCODE_UNKNOWN/VoidSymbol/純文字鍵：只有帶文字的（€「」等）可預覽
     return !TextUtils.isEmpty(click.getText());

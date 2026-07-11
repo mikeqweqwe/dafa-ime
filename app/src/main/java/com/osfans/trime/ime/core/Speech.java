@@ -37,13 +37,13 @@ import timber.log.Timber;
 /** {@link RecognitionListener 語音輸入} */
 public class Speech implements RecognitionListener {
   private final Context context;
-  private final SpeechRecognizer speechRecognizer;
+  private SpeechRecognizer speechRecognizer;
   private final Intent recognizerIntent;
 
   public Speech(@NonNull Context context) {
+    // recognizer 延遲到 startListening 檢查通過才建立：每次按鍵都會 new Speech，
+    // 檢查不過就建構會洩漏系統服務連線（destroy 只在 onError/onResults 觸發）
     this.context = context;
-    speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
-    speechRecognizer.setRecognitionListener(this);
     recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
     // recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
@@ -54,8 +54,10 @@ public class Speech implements RecognitionListener {
   }
 
   public void startListening() {
-    // RECORD_AUDIO 是 runtime 權限，IME 無法自行彈授權框：缺權限時導去 App 設定頁
-    if (context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+    // RECORD_AUDIO 是 runtime 權限，IME 無法自行彈授權框：缺權限時導去 App 設定頁。
+    // ContextCompat 版在 API<23 回傳安裝時授權結果（minSdk 21，Context 版會 crash）
+    if (androidx.core.content.ContextCompat.checkSelfPermission(
+            context, android.Manifest.permission.RECORD_AUDIO)
         != android.content.pm.PackageManager.PERMISSION_GRANTED) {
       ToastUtils.showLong("請授予「麥克風」權限後再使用聽寫");
       final Intent intent =
@@ -70,7 +72,9 @@ public class Speech implements RecognitionListener {
       ToastUtils.showShort("此裝置沒有可用的語音辨識服務");
       return;
     }
-    if (speechRecognizer != null) speechRecognizer.startListening(recognizerIntent);
+    speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
+    speechRecognizer.setRecognitionListener(this);
+    speechRecognizer.startListening(recognizerIntent);
   }
 
   @Override

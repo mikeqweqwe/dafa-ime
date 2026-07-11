@@ -113,8 +113,9 @@ class EditorInstance(private val ims: InputMethodService) {
         // 注音字元不在表內原樣保留，冪等
         // 不映射空格→ˉ：preedit 的音節分隔也是空格會被誤轉，一聲本就無標調。
         // 游標改用系統 selection 顯示（soft_cursors 已關），殘留的「‸」直接濾掉
-        private const val DAQIAN_RAW = "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347"
-        private const val DAQIAN_BPMF = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙"
+        // 空白=一聲字根：raw 空格顯示為 ˉ（音節分隔符是 U+2002 en space，不衝突）
+        private const val DAQIAN_RAW = "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347"
+        private const val DAQIAN_BPMF = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙"
 
         private fun daqianToBpmf(s: String?): String {
             if (s.isNullOrEmpty()) return ""

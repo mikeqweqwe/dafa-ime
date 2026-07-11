@@ -35,6 +35,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.os.StrictMode;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -42,6 +43,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -1019,7 +1021,7 @@ public class Trime extends LifecycleInputMethodService {
     } else { // 空格、回車等
       mask = event.getMetaState();
     }
-    final boolean ret = handleKey(keyCode, mask);
+    final boolean ret = handleKey(keyCode, mask, true); // 實體鍵盤路徑
     if (isComposing()) setCandidatesViewShown(textInputManager.isComposable()); // 藍牙鍵盤打字時顯示候選欄
     return ret;
   }
@@ -1067,17 +1069,49 @@ public class Trime extends LifecycleInputMethodService {
   // 雙擊空白偵測（非組字時連擊兩下空白＝句號）
   private long lastSpaceTapTime = 0;
 
-  // 处理键盘事件(Android keycode)
-  public boolean handleKey(int keyEventCode, int metaState) { // 軟鍵盤
+  /** 密碼／網址欄不做雙擊空白句號（iOS/Gboard 同款停用） */
+  private boolean isSensitiveEditor() {
+    final EditorInfo ei =
+        activeEditorInstance != null ? activeEditorInstance.getEditorInfo() : null;
+    if (ei == null) return false;
+    if ((ei.inputType & InputType.TYPE_MASK_CLASS) != InputType.TYPE_CLASS_TEXT) return false;
+    final int v = ei.inputType & InputType.TYPE_MASK_VARIATION;
+    return v == InputType.TYPE_TEXT_VARIATION_PASSWORD
+        || v == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        || v == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+        || v == InputType.TYPE_TEXT_VARIATION_URI;
+  }
+
+  /**
+   * 中英流程判定（決定雙擊空白出「。」還是「.」）。不能用 Rime.isAsciiMode()：本主題
+   * 注音流程的數字／符號頁也是 ascii_mode: 1。以目前頁名（主頁）或最後鎖定主頁為準。
+   */
+  private boolean isEnglishFlow() {
+    try {
+      String name = keyboardSwitcher.getCurrentKeyboardName();
+      if (!name.startsWith("english") && !name.startsWith("zhuyin")) {
+        name = keyboardSwitcher.getKeyboardNames().get(keyboardSwitcher.getLastLockId());
+      }
+      return name.startsWith("english");
+    } catch (Exception e) {
+      return Rime.isAsciiMode();
+    }
+  }
+
+  // 处理键盘事件(Android keycode)——軟鍵盤入口
+  public boolean handleKey(int keyEventCode, int metaState) {
+    return handleKey(keyEventCode, metaState, false);
+  }
+
+  public boolean handleKey(int keyEventCode, int metaState, boolean fromHardKeyboard) {
     textInputManager.setNeedSendUpRimeKey(false);
     // 組字中按 Enter＝確認目前組字上屏（iOS/Gboard 行為），不換行。不能讓 Return 進
     // librime：fluency_editor 對 Return 會 commit 原始大千碼／分段殘渣（英數外洩）。
-    // 只攔無 chord modifier 的 Enter，Ctrl/Shift+Enter 等組合鍵留給 RIME
+    // chord 排除不含 SHIFT：ascii 鍵盤的事件常態帶 SHIFT mask（TextInputManager 把
+    // 鍵盤殘留 modifier OR 進每個事件），含 SHIFT 會讓「組字中切到英文頁再按 Enter」
+    // 的攔截失效、大千碼外洩
     final int chordMask =
-        KeyEvent.META_CTRL_MASK
-            | KeyEvent.META_ALT_MASK
-            | KeyEvent.META_SHIFT_MASK
-            | KeyEvent.META_META_MASK;
+        KeyEvent.META_CTRL_MASK | KeyEvent.META_ALT_MASK | KeyEvent.META_META_MASK;
     if ((keyEventCode == KeyEvent.KEYCODE_ENTER || keyEventCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
         && (metaState & chordMask) == 0
         && Rime.isComposing()) {
@@ -1085,27 +1119,27 @@ public class Trime extends LifecycleInputMethodService {
       activeEditorInstance.commitRimeText();
       return true;
     }
-    // 非組字時 350ms 內連擊兩下空白＝句號（iOS 慣例）：撤回第一擊上屏的空格，
-    // 改上屏中文全形「。」／英文半形「.」。組字中空白＝一聲字根，不參與偵測。
-    // 注意：ascii 鍵盤的按鍵事件常態帶 SHIFT mask（metaState=1），故只排除
-    // Ctrl/Alt/Meta 組合鍵，不排除 Shift
-    final int spaceChordMask =
-        KeyEvent.META_CTRL_MASK | KeyEvent.META_ALT_MASK | KeyEvent.META_META_MASK;
-    if (keyEventCode == KeyEvent.KEYCODE_SPACE
-        && (metaState & spaceChordMask) == 0
+    // 非組字時雙擊窗內連擊兩下空白＝句號（iOS 慣例）：撤回第一擊上屏的空格，改上屏
+    // 中文流程全形「。」／英文流程半形「.」。組字中空白＝一聲字根，不參與偵測。
+    // 僅軟鍵盤：實體鍵盤連按或長按 auto-repeat 打多個空格是合理操作，不得改寫。
+    if (!fromHardKeyboard
+        && keyEventCode == KeyEvent.KEYCODE_SPACE
+        && (metaState & chordMask) == 0
         && !Rime.isComposing()) {
-      final long now = System.currentTimeMillis();
+      final long now = SystemClock.uptimeMillis();
       final long sinceLast = now - lastSpaceTapTime;
       lastSpaceTapTime = now;
-      if (sinceLast < 350) {
+      if (sinceLast < ViewConfiguration.getDoubleTapTimeout() && !isSensitiveEditor()) {
         final InputConnection ic = getCurrentInputConnection();
         final CharSequence before = ic != null ? ic.getTextBeforeCursor(1, 0) : null;
         if (before != null
             && before.length() == 1
             && (before.charAt(0) == ' ' || before.charAt(0) == '　')) {
           lastSpaceTapTime = 0;
+          ic.beginBatchEdit();
           ic.deleteSurroundingText(1, 0);
-          ic.commitText(Rime.isAsciiMode() ? "." : "。", 1);
+          ic.commitText(isEnglishFlow() ? "." : "。", 1);
+          ic.endBatchEdit();
           return true;
         }
       }
