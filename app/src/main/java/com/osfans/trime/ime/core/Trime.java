@@ -35,8 +35,8 @@ import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -1083,8 +1083,8 @@ public class Trime extends LifecycleInputMethodService {
   }
 
   /**
-   * 中英流程判定（決定雙擊空白出「。」還是「.」）。不能用 Rime.isAsciiMode()：本主題
-   * 注音流程的數字／符號頁也是 ascii_mode: 1。以目前頁名（主頁）或最後鎖定主頁為準。
+   * 中英流程判定（決定雙擊空白出「。」還是「.」）。不能用 Rime.isAsciiMode()：本主題 注音流程的數字／符號頁也是 ascii_mode:
+   * 1。以目前頁名（主頁）或最後鎖定主頁為準。
    */
   private boolean isEnglishFlow() {
     try {
