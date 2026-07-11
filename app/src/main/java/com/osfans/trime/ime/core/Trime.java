@@ -1087,8 +1087,8 @@ public class Trime extends LifecycleInputMethodService {
   }
 
   /**
-   * 中英流程判定（決定雙擊空白出「。」還是「.」）。不能用 Rime.isAsciiMode()：本主題 注音流程的數字／符號頁也是 ascii_mode:
-   * 1。以主頁（lock 頁只有注音／英文四頁）或最後鎖定主頁的 ascii_mode 為準。
+   * 中英流程判定（決定雙擊空白出「。」還是「.」）。不能用 Rime.isAsciiMode()：本主題 注音流程的數字／符號頁也是 ascii_mode: 1。以主頁（lock
+   * 頁只有注音／英文四頁）或最後鎖定主頁的 ascii_mode 為準。
    */
   private boolean isEnglishFlow() {
     final Keyboard current = keyboardSwitcher.getCurrentKeyboard();
