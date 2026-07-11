@@ -1087,8 +1087,12 @@ public class Trime extends LifecycleInputMethodService {
     }
     // 非組字時 350ms 內連擊兩下空白＝句號（iOS 慣例）：撤回第一擊上屏的空格，
     // 改上屏中文全形「。」／英文半形「.」。組字中空白＝一聲字根，不參與偵測。
+    // 注意：ascii 鍵盤的按鍵事件常態帶 SHIFT mask（metaState=1），故只排除
+    // Ctrl/Alt/Meta 組合鍵，不排除 Shift
+    final int spaceChordMask =
+        KeyEvent.META_CTRL_MASK | KeyEvent.META_ALT_MASK | KeyEvent.META_META_MASK;
     if (keyEventCode == KeyEvent.KEYCODE_SPACE
-        && (metaState & chordMask) == 0
+        && (metaState & spaceChordMask) == 0
         && !Rime.isComposing()) {
       final long now = System.currentTimeMillis();
       final long sinceLast = now - lastSpaceTapTime;
