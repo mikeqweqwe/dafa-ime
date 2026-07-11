@@ -18,14 +18,18 @@
 
 package com.osfans.trime.ime.core;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import com.blankj.utilcode.util.IntentUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.osfans.trime.R;
 import com.osfans.trime.core.Rime;
@@ -56,16 +60,11 @@ public class Speech implements RecognitionListener {
   public void startListening() {
     // RECORD_AUDIO 是 runtime 權限，IME 無法自行彈授權框：缺權限時導去 App 設定頁。
     // ContextCompat 版在 API<23 回傳安裝時授權結果（minSdk 21，Context 版會 crash）
-    if (androidx.core.content.ContextCompat.checkSelfPermission(
-            context, android.Manifest.permission.RECORD_AUDIO)
-        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+        != PackageManager.PERMISSION_GRANTED) {
       ToastUtils.showLong("請授予「麥克風」權限後再使用聽寫");
-      final Intent intent =
-          new Intent(
-              android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-              android.net.Uri.parse("package:" + context.getPackageName()));
-      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      context.startActivity(intent);
+      context.startActivity(
+          IntentUtils.getLaunchAppDetailsSettingsIntent(context.getPackageName(), true));
       return;
     }
     if (!SpeechRecognizer.isRecognitionAvailable(context)) {

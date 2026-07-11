@@ -1021,7 +1021,7 @@ public class Trime extends LifecycleInputMethodService {
     } else { // 空格、回車等
       mask = event.getMetaState();
     }
-    final boolean ret = handleKey(keyCode, mask, true); // 實體鍵盤路徑
+    final boolean ret = dispatchKey(keyCode, mask); // 實體鍵盤路徑（不做雙擊空白句號）
     if (isComposing()) setCandidatesViewShown(textInputManager.isComposable()); // 藍牙鍵盤打字時顯示候選欄
     return ret;
   }
@@ -1066,13 +1066,17 @@ public class Trime extends LifecycleInputMethodService {
     }
   }
 
+  // chord 排除不含 SHIFT：ascii 鍵盤的事件常態帶 SHIFT mask（TextInputManager 把
+  // 鍵盤殘留 modifier OR 進每個事件），含 SHIFT 會讓組合鍵判定誤傷一般按鍵
+  private static final int CHORD_MASK =
+      KeyEvent.META_CTRL_MASK | KeyEvent.META_ALT_MASK | KeyEvent.META_META_MASK;
+
   // 雙擊空白偵測（非組字時連擊兩下空白＝句號）
   private long lastSpaceTapTime = 0;
 
   /** 密碼／網址欄不做雙擊空白句號（iOS/Gboard 同款停用） */
   private boolean isSensitiveEditor() {
-    final EditorInfo ei =
-        activeEditorInstance != null ? activeEditorInstance.getEditorInfo() : null;
+    final EditorInfo ei = getCurrentInputEditorInfo();
     if (ei == null) return false;
     if ((ei.inputType & InputType.TYPE_MASK_CLASS) != InputType.TYPE_CLASS_TEXT) return false;
     final int v = ei.inputType & InputType.TYPE_MASK_VARIATION;
@@ -1084,65 +1088,63 @@ public class Trime extends LifecycleInputMethodService {
 
   /**
    * 中英流程判定（決定雙擊空白出「。」還是「.」）。不能用 Rime.isAsciiMode()：本主題 注音流程的數字／符號頁也是 ascii_mode:
-   * 1。以目前頁名（主頁）或最後鎖定主頁為準。
+   * 1。以主頁（lock 頁只有注音／英文四頁）或最後鎖定主頁的 ascii_mode 為準。
    */
   private boolean isEnglishFlow() {
-    try {
-      String name = keyboardSwitcher.getCurrentKeyboardName();
-      if (!name.startsWith("english") && !name.startsWith("zhuyin")) {
-        name = keyboardSwitcher.getKeyboardNames().get(keyboardSwitcher.getLastLockId());
-      }
-      return name.startsWith("english");
-    } catch (Exception e) {
-      return Rime.isAsciiMode();
-    }
+    final Keyboard current = keyboardSwitcher.getCurrentKeyboard();
+    final Keyboard main =
+        current.isLock()
+            ? current
+            : keyboardSwitcher.getKeyboards()[keyboardSwitcher.getLastLockId()];
+    return main.getAsciiMode();
   }
 
-  // 处理键盘事件(Android keycode)——軟鍵盤入口
+  /**
+   * 非組字時雙擊窗內連擊兩下空白＝句號（iOS 慣例）：撤回第一擊上屏的空格，改上屏 中文流程全形「。」／英文流程半形「.」。組字中空白＝一聲字根，不參與偵測。
+   *
+   * @return true 表示本次按鍵已被句號轉換消費
+   */
+  private boolean tryDoubleSpacePeriod(int metaState) {
+    if ((metaState & CHORD_MASK) != 0 || Rime.isComposing()) return false;
+    final long now = SystemClock.uptimeMillis();
+    final long sinceLast = now - lastSpaceTapTime;
+    lastSpaceTapTime = now;
+    if (sinceLast >= ViewConfiguration.getDoubleTapTimeout() || isSensitiveEditor()) return false;
+    final InputConnection ic = getCurrentInputConnection();
+    final CharSequence before = ic != null ? ic.getTextBeforeCursor(1, 0) : null;
+    if (before == null
+        || before.length() != 1
+        || (before.charAt(0) != ' ' && before.charAt(0) != '　')) return false;
+    lastSpaceTapTime = 0;
+    ic.beginBatchEdit();
+    ic.deleteSurroundingText(1, 0);
+    ic.commitText(isEnglishFlow() ? "." : "。", 1);
+    ic.endBatchEdit();
+    return true;
+  }
+
+  // 处理键盘事件(Android keycode)——軟鍵盤入口。
+  // 雙擊空白句號只在這層做：實體鍵盤（dispatchKey）連按或 auto-repeat 打多個空格是合理操作
   public boolean handleKey(int keyEventCode, int metaState) {
-    return handleKey(keyEventCode, metaState, false);
+    if (keyEventCode == KeyEvent.KEYCODE_SPACE && tryDoubleSpacePeriod(metaState)) {
+      textInputManager.setNeedSendUpRimeKey(false);
+      return true;
+    }
+    return dispatchKey(keyEventCode, metaState);
   }
 
-  public boolean handleKey(int keyEventCode, int metaState, boolean fromHardKeyboard) {
+  // 軟硬鍵盤共用核心
+  public boolean dispatchKey(int keyEventCode, int metaState) {
     textInputManager.setNeedSendUpRimeKey(false);
     // 組字中按 Enter＝確認目前組字上屏（iOS/Gboard 行為），不換行。不能讓 Return 進
     // librime：fluency_editor 對 Return 會 commit 原始大千碼／分段殘渣（英數外洩）。
-    // chord 排除不含 SHIFT：ascii 鍵盤的事件常態帶 SHIFT mask（TextInputManager 把
-    // 鍵盤殘留 modifier OR 進每個事件），含 SHIFT 會讓「組字中切到英文頁再按 Enter」
-    // 的攔截失效、大千碼外洩
-    final int chordMask =
-        KeyEvent.META_CTRL_MASK | KeyEvent.META_ALT_MASK | KeyEvent.META_META_MASK;
+    // CHORD_MASK 不含 SHIFT，否則組字中切到英文頁按 Enter 時攔截失效、大千碼外洩
     if ((keyEventCode == KeyEvent.KEYCODE_ENTER || keyEventCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
-        && (metaState & chordMask) == 0
+        && (metaState & CHORD_MASK) == 0
         && Rime.isComposing()) {
       Rime.commitComposition();
       activeEditorInstance.commitRimeText();
       return true;
-    }
-    // 非組字時雙擊窗內連擊兩下空白＝句號（iOS 慣例）：撤回第一擊上屏的空格，改上屏
-    // 中文流程全形「。」／英文流程半形「.」。組字中空白＝一聲字根，不參與偵測。
-    // 僅軟鍵盤：實體鍵盤連按或長按 auto-repeat 打多個空格是合理操作，不得改寫。
-    if (!fromHardKeyboard
-        && keyEventCode == KeyEvent.KEYCODE_SPACE
-        && (metaState & chordMask) == 0
-        && !Rime.isComposing()) {
-      final long now = SystemClock.uptimeMillis();
-      final long sinceLast = now - lastSpaceTapTime;
-      lastSpaceTapTime = now;
-      if (sinceLast < ViewConfiguration.getDoubleTapTimeout() && !isSensitiveEditor()) {
-        final InputConnection ic = getCurrentInputConnection();
-        final CharSequence before = ic != null ? ic.getTextBeforeCursor(1, 0) : null;
-        if (before != null
-            && before.length() == 1
-            && (before.charAt(0) == ' ' || before.charAt(0) == '　')) {
-          lastSpaceTapTime = 0;
-          ic.beginBatchEdit();
-          ic.deleteSurroundingText(1, 0);
-          ic.commitText(isEnglishFlow() ? "." : "。", 1);
-          ic.endBatchEdit();
-          return true;
-        }
-      }
     }
     if (onRimeKey(Event.getRimeEvent(keyEventCode, metaState))) {
       // 如果输入法消费了按键事件，则需要释放按键
