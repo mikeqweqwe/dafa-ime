@@ -17,8 +17,8 @@ import com.osfans.trime.util.RimeUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
 import timber.log.Timber
+import java.io.File
 
 /**
  * 自訂短語管理：字詞＋輸入碼（注音或英文字母／數字）寫入 RIME custom_phrase 表
