@@ -86,7 +86,7 @@ class EditorInstance(private val ims: InputMethodService) {
         val ic = inputConnection ?: return
         val composingText = when (prefs.keyboard.inlinePreedit) {
             InlineModeType.INLINE_PREVIEW -> Rime.getComposingText()
-            InlineModeType.INLINE_COMPOSITION -> daqianToBpmf(Rime.getCompositionText())
+            InlineModeType.INLINE_COMPOSITION -> DaqianCode.toBpmf(Rime.getCompositionText())
             InlineModeType.INLINE_INPUT -> Rime.RimeGetInput()
             else -> ""
         }
@@ -104,28 +104,6 @@ class EditorInstance(private val ims: InputMethodService) {
                     ic.setSelection(target, target)
                 }
             }
-        }
-    }
-
-    companion object {
-        // 大千鍵碼→注音（同 iridium_bpmf preedit_format 的 xlit 表）。游標移進組字中間時
-        // librime 只格式化有 translator 的分段，游標後的分段以原始碼呈現——顯示前補轉，
-        // 注音字元不在表內原樣保留，冪等
-        // 不映射空格→ˉ：preedit 的音節分隔也是空格會被誤轉，一聲本就無標調。
-        // 游標改用系統 selection 顯示（soft_cursors 已關），殘留的「‸」直接濾掉
-        // 空白=一聲字根：raw 空格顯示為 ˉ（音節分隔符是 U+2002 en space，不衝突）
-        private const val DAQIAN_RAW = "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/- 6347"
-        private const val DAQIAN_BPMF = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙"
-
-        private fun daqianToBpmf(s: String?): String {
-            if (s.isNullOrEmpty()) return ""
-            val sb = StringBuilder(s.length)
-            for (c in s) {
-                if (c == '\u2038') continue // ‸
-                val i = DAQIAN_RAW.indexOf(c)
-                sb.append(if (i >= 0) DAQIAN_BPMF[i] else c)
-            }
-            return sb.toString()
         }
     }
 

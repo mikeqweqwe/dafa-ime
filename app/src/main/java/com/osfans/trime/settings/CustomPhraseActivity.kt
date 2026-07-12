@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -13,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ToastUtils
 import com.osfans.trime.data.AppPrefs
+import com.osfans.trime.ime.core.DaqianCode
 import com.osfans.trime.util.RimeUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -72,11 +74,11 @@ class CustomPhraseActivity : AppCompatActivity() {
         }
         val codeInput = EditText(this).apply {
             hint = "輸入碼"
-            // VISIBLE_PASSWORD：本輸入法對密碼欄自動切英文鍵盤——輸入碼是鍵位字母，
-            // 讓使用者不必手動切換；注音碼＝按注音在鍵盤上的同位置（大千鍵位與 qwerty 同位）
-            inputType = InputType.TYPE_CLASS_TEXT or
-                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
-                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            // 輸入碼是鍵位字母／數字，用標準 IME_FLAG_FORCE_ASCII 請 IME 切英數鍵盤
+            // （本 IME 在 TextInputManager 直接處理此旗標→英文頁），使用者不必手動切；
+            // 注音碼＝按注音在鍵盤上的同位置（大千鍵位與 qwerty 同位）
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            imeOptions = imeOptions or EditorInfo.IME_FLAG_FORCE_ASCII
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2f)
         }
         val addButton = Button(this).apply { text = "新增" }
@@ -122,7 +124,7 @@ class CustomPhraseActivity : AppCompatActivity() {
         listView.setOnItemLongClickListener { _, _, position, _ ->
             val entry = entries[position]
             AlertDialog.Builder(this)
-                .setMessage("刪除「${entry.text}」（${codeToDisplay(entry.code)}）？")
+                .setMessage("刪除「${entry.text}」（${DaqianCode.toBpmf(entry.code)}）？")
                 .setPositiveButton("刪除") { _, _ ->
                     val removed = entries.removeAt(position)
                     if (save()) refreshList() else entries.add(position, removed)
@@ -186,7 +188,7 @@ class CustomPhraseActivity : AppCompatActivity() {
         adapter.clear()
         // 附上 raw 鍵位碼：ColorOS 主題字型缺部分注音 glyph（如 ㄖ 顯示成方框），
         // 括號裡的英文碼永遠可讀
-        adapter.addAll(entries.map { "${it.text}    ←  ${codeToDisplay(it.code)}（${it.code}）" })
+        adapter.addAll(entries.map { "${it.text}    ←  ${DaqianCode.toBpmf(it.code)}（${it.code}）" })
     }
 
     companion object {
@@ -194,31 +196,18 @@ class CustomPhraseActivity : AppCompatActivity() {
         private const val FILE_HEADER =
             "# Rime table\n#@/db_name\tiridium_bpmf_phrase.txt\n#@/db_type\ttabledb\n"
 
-        // 大千鍵位對照（注音→raw）；一聲 ˉ＝空白會破壞 tab 分隔格式，不開放
-        private const val BPMF = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙"
-        private const val RAW = "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347"
-
-        /** 注音轉大千 raw；英文字母轉小寫、數字原樣；含其他字元回 null */
+        /** 注音轉大千 raw；英文字母轉小寫、數字原樣；一聲／含其他字元回 null（見 DaqianCode） */
         private fun normalizeCode(s: String): String? {
             val sb = StringBuilder()
             for (c in s) {
-                val i = BPMF.indexOf(c)
+                val i = DaqianCode.BPMF.indexOf(c)
                 when {
-                    i >= 0 -> sb.append(RAW[i])
+                    // 一聲 ˉ 映射到空格，會破壞 tabledb 的 tab 分隔，不開放
+                    i >= 0 -> DaqianCode.RAW[i].let { if (it == ' ') return null else sb.append(it) }
                     c in 'a'..'z' || c in '0'..'9' -> sb.append(c)
                     c in 'A'..'Z' -> sb.append(c.lowercaseChar())
                     else -> return null
                 }
-            }
-            return sb.toString()
-        }
-
-        /** raw 碼顯示為注音（英文字根位優先顯示注音；表外字元原樣） */
-        private fun codeToDisplay(code: String): String {
-            val sb = StringBuilder()
-            for (c in code) {
-                val i = RAW.indexOf(c)
-                sb.append(if (i >= 0) BPMF[i] else c)
             }
             return sb.toString()
         }
