@@ -20,7 +20,7 @@
     <Preference android:key="conf__custom_phrase"
         app:iconSpaceReserved="false"
         android:title="自訂短語"
-        android:summary="新增字詞與輸入碼（如 bbbb→今天辛苦了、ㄏㄆ→我好帥）"/>
+        android:summary="新增字詞與輸入碼"/>
 
     <Preference android:key="conf__synchronize"
         app:iconSpaceReserved="false"
