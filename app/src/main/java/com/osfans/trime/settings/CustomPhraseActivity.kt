@@ -14,9 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ToastUtils
 import com.osfans.trime.data.AppPrefs
 import com.osfans.trime.util.RimeUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -25,7 +24,7 @@ import java.io.File
  * （iridium_bpmf_phrase.txt，schema 的 table_translator@custom_phrase 已掛載，
  * 候選排在一般組字之前）。輸入碼以大千鍵位 raw 儲存，注音在此轉換。
  */
-class CustomPhraseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
+class CustomPhraseActivity : AppCompatActivity() {
 
     private data class Entry(val text: String, val code: String)
 
@@ -50,7 +49,9 @@ class CustomPhraseActivity : AppCompatActivity(), CoroutineScope by MainScope() 
 
         root.addView(
             TextView(this).apply {
-                text = "輸入碼可用注音（ㄏㄆ）或英文字母、數字（bbbb）；打出輸入碼時字詞會出現在候選列。長按條目可刪除。"
+                text = "打出輸入碼時字詞會出現在候選列。輸入碼欄會自動切成英文鍵盤：" +
+                    "直接打字母或數字（bbbb）；要用注音當碼，按注音在鍵盤上的相同位置" +
+                    "（ㄏㄆ 就按 ㄏ、ㄆ 位置的鍵）。長按條目可刪除。"
                 setPadding(0, 8.px(), 0, 8.px())
             }
         )
@@ -70,7 +71,11 @@ class CustomPhraseActivity : AppCompatActivity(), CoroutineScope by MainScope() 
         }
         val codeInput = EditText(this).apply {
             hint = "輸入碼"
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            // VISIBLE_PASSWORD：本輸入法對密碼欄自動切英文鍵盤——輸入碼是鍵位字母，
+            // 讓使用者不必手動切換；注音碼＝按注音在鍵盤上的同位置（大千鍵位與 qwerty 同位）
+            inputType = InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2f)
         }
         val addButton = Button(this).apply { text = "新增" }
@@ -122,18 +127,15 @@ class CustomPhraseActivity : AppCompatActivity(), CoroutineScope by MainScope() 
         refreshList()
     }
 
+    // 變更過才重新部署（幾秒鐘，完成有 toast）。必須用 GlobalScope：
+    // 退出頁面時 onStop 後緊接 onDestroy，綁 Activity 的 scope 會把部署取消掉
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onStop() {
         super.onStop()
-        // 變更過才重新部署（幾秒鐘，背景執行，完成有 toast）
         if (dirty) {
             dirty = false
-            launch { RimeUtils.deploy(applicationContext) }
+            GlobalScope.launch { RimeUtils.deploy(applicationContext) }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        cancel()
     }
 
     private fun load() {
