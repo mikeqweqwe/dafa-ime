@@ -215,6 +215,8 @@ class TextInputManager private constructor() :
                                 InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE -> {
                                     null.also { performEnterAsLineBreak = true }
                                 }
+                                // 注意：CustomPhraseActivity 的輸入碼欄刻意設 VISIBLE_PASSWORD，
+                                // 靠此分流自動切英文鍵盤（鍵位即碼）；改動此清單前先確認該處
                                 InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
                                 InputType.TYPE_TEXT_VARIATION_PASSWORD,
                                 InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,

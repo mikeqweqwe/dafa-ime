@@ -1115,10 +1115,13 @@ public class Trime extends LifecycleInputMethodService {
     if (before == null
         || before.length() != 1
         || (before.charAt(0) != ' ' && before.charAt(0) != '　')) return false;
+    // 先算好標點再動編輯器：isEnglishFlow 若拋例外（鍵盤狀態異常），才不會落在
+    // 「空格已刪、句號沒補、batchEdit 未關」的半途狀態
+    final String period = isEnglishFlow() ? "." : "。";
     lastSpaceTapTime = 0;
     ic.beginBatchEdit();
     ic.deleteSurroundingText(1, 0);
-    ic.commitText(isEnglishFlow() ? "." : "。", 1);
+    ic.commitText(period, 1);
     ic.endBatchEdit();
     return true;
   }

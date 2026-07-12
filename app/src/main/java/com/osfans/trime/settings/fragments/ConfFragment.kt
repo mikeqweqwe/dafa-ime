@@ -38,7 +38,7 @@ class ConfFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope() {
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
         return when (preference?.key) {
             "conf__custom_phrase" -> {
-                startActivity(Intent(context, CustomPhraseActivity::class.java))
+                startActivity(Intent(requireContext(), CustomPhraseActivity::class.java))
                 true
             }
             "conf__synchronize" -> {

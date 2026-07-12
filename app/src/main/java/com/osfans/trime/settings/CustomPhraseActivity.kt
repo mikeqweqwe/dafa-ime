@@ -18,6 +18,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
+import timber.log.Timber
 
 /**
  * 自訂短語管理：字詞＋輸入碼（注音或英文字母／數字）寫入 RIME custom_phrase 表
@@ -97,13 +98,22 @@ class CustomPhraseActivity : AppCompatActivity() {
                 ToastUtils.showShort("字詞與輸入碼都要填")
                 return@setOnClickListener
             }
+            // Tab／換行是 tabledb 檔案的欄位／行分隔符，字詞含它們會破壞往返
+            if (text.any { it == '\t' || it == '\n' || it == '\r' }) {
+                ToastUtils.showShort("字詞不能包含 Tab 或換行")
+                return@setOnClickListener
+            }
             val code = normalizeCode(rawCode)
             if (code == null) {
                 ToastUtils.showLong("輸入碼只能用注音符號、英文字母或數字（不含一聲／空白）")
                 return@setOnClickListener
             }
+            // 先入列再存檔，失敗回滾：確保記憶體與檔案一致
             entries.add(Entry(text, code))
-            save()
+            if (!save()) {
+                entries.removeAt(entries.size - 1)
+                return@setOnClickListener
+            }
             refreshList()
             textInput.text.clear()
             codeInput.text.clear()
@@ -114,9 +124,8 @@ class CustomPhraseActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                 .setMessage("刪除「${entry.text}」（${codeToDisplay(entry.code)}）？")
                 .setPositiveButton("刪除") { _, _ ->
-                    entries.removeAt(position)
-                    save()
-                    refreshList()
+                    val removed = entries.removeAt(position)
+                    if (save()) refreshList() else entries.add(position, removed)
                 }
                 .setNegativeButton("取消", null)
                 .show()
@@ -142,20 +151,35 @@ class CustomPhraseActivity : AppCompatActivity() {
         entries.clear()
         val file = phraseFile
         if (!file.exists()) return
-        file.forEachLine { line ->
-            if (line.isBlank() || line.startsWith("#")) return@forEachLine
-            val parts = line.split('\t')
-            if (parts.size >= 2 && parts[0].isNotBlank() && parts[1].isNotBlank()) {
-                entries.add(Entry(parts[0], parts[1]))
+        try {
+            file.forEachLine { line ->
+                // 只跳 tabledb 表頭（"# Rime table"／"#@/..."），不誤殺以 # 開頭的使用者字詞
+                if (line.isBlank() || line.startsWith("#@") || line.startsWith("# ")) {
+                    return@forEachLine
+                }
+                val parts = line.split('\t')
+                if (parts.size >= 2 && parts[0].isNotBlank() && parts[1].isNotBlank()) {
+                    entries.add(Entry(parts[0], parts[1]))
+                }
             }
+        } catch (e: Exception) {
+            Timber.e(e, "load custom phrase failed")
         }
     }
 
-    private fun save() {
+    /** @return 寫檔成功與否；失敗時 toast 提示、不設 dirty（不觸發部署） */
+    private fun save(): Boolean {
         val sb = StringBuilder(FILE_HEADER)
         for (e in entries) sb.append(e.text).append('\t').append(e.code).append("\t1\n")
-        phraseFile.apply { parentFile?.mkdirs() }.writeText(sb.toString())
-        dirty = true
+        return try {
+            phraseFile.apply { parentFile?.mkdirs() }.writeText(sb.toString())
+            dirty = true
+            true
+        } catch (e: Exception) {
+            Timber.e(e, "save custom phrase failed")
+            ToastUtils.showLong("寫入失敗，請檢查共享資料夾設定")
+            false
+        }
     }
 
     private fun refreshList() {
