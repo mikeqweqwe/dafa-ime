@@ -160,7 +160,9 @@ class CustomPhraseActivity : AppCompatActivity() {
 
     private fun refreshList() {
         adapter.clear()
-        adapter.addAll(entries.map { "${it.text}    ←  ${codeToDisplay(it.code)}" })
+        // 附上 raw 鍵位碼：ColorOS 主題字型缺部分注音 glyph（如 ㄖ 顯示成方框），
+        // 括號裡的英文碼永遠可讀
+        adapter.addAll(entries.map { "${it.text}    ←  ${codeToDisplay(it.code)}（${it.code}）" })
     }
 
     companion object {
