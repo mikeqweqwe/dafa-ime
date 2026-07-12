@@ -1,4 +1,5 @@
 # Rime table
 #@/db_name	iridium_bpmf_phrase.txt
 #@/db_type	tabledb
-
+今天辛苦了	bbbb	1
+我好帥	cq	1

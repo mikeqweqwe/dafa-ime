@@ -1,6 +1,7 @@
 package com.osfans.trime.settings.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.core.view.forEach
@@ -9,6 +10,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.osfans.trime.R
 import com.osfans.trime.data.AppPrefs
+import com.osfans.trime.settings.CustomPhraseActivity
 import com.osfans.trime.settings.components.ResetAssetsDialog
 import com.osfans.trime.util.RimeUtils
 import com.osfans.trime.util.createLoadingDialog
@@ -35,6 +37,10 @@ class ConfFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope() {
 
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
         return when (preference?.key) {
+            "conf__custom_phrase" -> {
+                startActivity(Intent(context, CustomPhraseActivity::class.java))
+                true
+            }
             "conf__synchronize" -> {
                 val progressDialog = createLoadingDialog(requireContext(), R.string.sync_progress)
                 launch {

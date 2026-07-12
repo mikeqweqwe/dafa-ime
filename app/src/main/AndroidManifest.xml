@@ -82,6 +82,9 @@
         <activity android:name=".settings.AboutActivity"
             android:label="@string/settings__about_title" />
 
+        <activity android:name=".settings.CustomPhraseActivity"
+            android:exported="false" />
+
         <activity
             android:name=".setup.SetupActivity"
             android:exported="false" />

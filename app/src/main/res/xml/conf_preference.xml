@@ -17,6 +17,11 @@
         android:title="@string/conf__user_data_dir_title"
         app:useSimpleSummaryProvider="true"/>
 
+    <Preference android:key="conf__custom_phrase"
+        app:iconSpaceReserved="false"
+        android:title="自訂短語"
+        android:summary="新增字詞與輸入碼（如 bbbb→今天辛苦了、ㄏㄆ→我好帥）"/>
+
     <Preference android:key="conf__synchronize"
         app:iconSpaceReserved="false"
         android:title="@string/conf__synchronize_title"
