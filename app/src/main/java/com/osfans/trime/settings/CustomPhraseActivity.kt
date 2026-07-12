@@ -14,11 +14,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ToastUtils
 import com.osfans.trime.data.AppPrefs
 import com.osfans.trime.util.RimeUtils
-import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * 自訂短語管理：字詞＋輸入碼（注音或英文字母／數字）寫入 RIME custom_phrase 表
