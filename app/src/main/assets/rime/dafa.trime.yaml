@@ -6,7 +6,7 @@
 #             ㄧ=u ㄨ=j ㄩ=m ㄚ=8 ㄛ=i ㄜ=k ㄝ=, ㄞ=9 ㄟ=o ㄠ=l ㄡ=.
 #             ㄢ=0 ㄣ=p ㄤ=; ㄥ=/ ㄦ=- ˊ=6 ˇ=3 ˋ=4 ˙=7
 
-config_version: "3.26"
+config_version: "3.27"
 name: dafa
 author: Hau Liu
 
@@ -247,6 +247,8 @@ preset_keyboards:
     name: 注音鍵盤（收合）
     author: Hau Liu
     ascii_mode: 0
+    # 換輸入框重置時，引擎對齊本頁 ascii_mode（畫面／引擎同步，否則畫面英文引擎注音）
+    reset_ascii_mode: true
     # 密碼/email 欄位強制 .ascii 時切到英文佈局，不留在注音鍵帽上打英數
     ascii_keyboard: english
     width: 10
@@ -322,6 +324,8 @@ preset_keyboards:
     name: 英文鍵盤（收合）
     author: Hau Liu
     ascii_mode: 1
+    # 換輸入框重置時，引擎對齊本頁 ascii_mode（畫面／引擎同步，否則畫面英文引擎注音）
+    reset_ascii_mode: true
     width: 10
     height: 48
     lock: true
@@ -577,6 +581,8 @@ preset_keyboards:
     name: 注音分離鍵盤
     author: dafa
     ascii_mode: 0
+    # 換輸入框重置時，引擎對齊本頁 ascii_mode（畫面／引擎同步，否則畫面英文引擎注音）
+    reset_ascii_mode: true
     # .ascii 目標填 english 即可，landRemap 會自動換成 english_land
     ascii_keyboard: english
     lock: true
@@ -652,6 +658,8 @@ preset_keyboards:
     name: 英文分離鍵盤
     author: dafa
     ascii_mode: 1
+    # 換輸入框重置時，引擎對齊本頁 ascii_mode（畫面／引擎同步，否則畫面英文引擎注音）
+    reset_ascii_mode: true
     lock: true
     width: 7.2
     height: 44
