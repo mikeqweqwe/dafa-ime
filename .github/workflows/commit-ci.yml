@@ -39,7 +39,21 @@ jobs:
       - name: Spotless code style check
         run: make spotless
 
+      # 固定簽章（見 app/build.gradle signingConfigs.dafa）。缺 secret 就中止：
+      # 寧可不出版，也不要發佈隨機簽名、手機無法覆蓋升級的 APK
+      - name: Restore signing keystore
+        env:
+          DAFA_KEYSTORE_B64: ${{ secrets.DAFA_KEYSTORE_B64 }}
+        run: |
+          if [ -z "$DAFA_KEYSTORE_B64" ]; then
+            echo "::error::缺少 DAFA_KEYSTORE_B64 secret，無法用固定簽章打包"
+            exit 1
+          fi
+          echo "$DAFA_KEYSTORE_B64" | base64 -d > app/dafa.keystore
+
       - name: Build Trime
+        env:
+          DAFA_KEYSTORE_PASS: ${{ secrets.DAFA_KEYSTORE_PASS }}
         run: make debug
 
       - name: Upload Trime artifact

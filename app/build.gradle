@@ -24,14 +24,25 @@ android {
     signingConfigs {
         release {
         }
+        // 固定簽章：CI 每次都是新 runner、預設 debug.keystore 隨機產生，每版簽名不同，
+        // 手機只能刪掉重裝（詞庫、自訂短語全失）。由 repo secret DAFA_KEYSTORE_B64 /
+        // DAFA_KEYSTORE_PASS 在 CI 還原成 app/dafa.keystore；本機沒有這個檔就用預設 debug 簽章
+        dafa {
+            storeFile file('dafa.keystore')
+            storePassword System.getenv('DAFA_KEYSTORE_PASS') ?: ''
+            keyAlias 'dafa'
+            keyPassword System.getenv('DAFA_KEYSTORE_PASS') ?: ''
+            storeType 'pkcs12'
+        }
     }
 
     buildTypes {
-        // CI 發佈的是 assembleDebug（沿用 debug 簽章，手機可直接覆蓋升級），但不能是
-        // debuggable：ART 對 debuggable app 停用大部分 JIT/AOT 最佳化，且 BuildConfig.DEBUG
-        // 會種下 Timber.DebugTree（每筆 log 抓 stack trace）→ 打字、選字明顯卡頓
+        // CI 發佈的是 assembleDebug，但不能是 debuggable：ART 對 debuggable app 停用
+        // 大部分 JIT/AOT 最佳化，且 BuildConfig.DEBUG 會種下 Timber.DebugTree
+        // （每筆 log 抓 stack trace）→ 打字、選字明顯卡頓
         debug {
             debuggable false
+            if (file('dafa.keystore').exists()) signingConfig signingConfigs.dafa
         }
         release {
             minifyEnabled false
