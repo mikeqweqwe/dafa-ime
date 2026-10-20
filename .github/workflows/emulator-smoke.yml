@@ -19,6 +19,8 @@ jobs:
           cache: 'gradle'
 
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools' # 'tools' 套件已從 SDK 下架
 
       - name: Build debug APK
         run: |

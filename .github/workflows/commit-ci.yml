@@ -23,6 +23,9 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # 預設 'tools platform-tools'：舊版 'tools' 套件已從 SDK 下架（cmdline-tools 16.0 找不到會失敗）
+          packages: 'platform-tools'
 
       - name: Get branch name
         id: vars
