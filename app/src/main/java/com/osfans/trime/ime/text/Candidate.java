@@ -30,7 +30,9 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewParent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.osfans.trime.core.Rime;
@@ -68,6 +70,12 @@ public class Candidate extends View {
   private int numCandidates;
   private int startNum = 0;
   private long timeDown = 0, timeMove = 0;
+  // 點選容錯：按下時的候選＋位置。外層 HorizontalScrollView 只要手指橫移超過 touchSlop
+  // 就會攔截觸控（送 CANCEL），快速打字時點候選手指稍微滑一下就整個不選字；
+  // 改成小幅滑動不放行，橫移超過 swipeSlop 才交給外層做翻頁／捲動
+  private int downIndex = -1;
+  private float downX;
+  private final int swipeSlop;
 
   private PaintDrawable candidateHighlight;
   private final Paint separatorPaint;
@@ -120,6 +128,7 @@ public class Candidate extends View {
 
   public Candidate(Context context, AttributeSet attrs) {
     super(context, attrs);
+    swipeSlop = ViewConfiguration.get(context).getScaledTouchSlop() * 3;
     candidatePaint = new Paint();
     candidatePaint.setAntiAlias(true);
     candidatePaint.setStrokeWidth(0);
@@ -378,23 +387,40 @@ public class Candidate extends View {
     int x = (int) me.getX();
     int y = (int) me.getY();
 
+    final ViewParent parent = getParent();
     switch (me.getActionMasked()) {
       case MotionEvent.ACTION_DOWN:
         timeDown = System.currentTimeMillis();
-      case MotionEvent.ACTION_MOVE:
+        downX = me.getX();
+        downIndex = getCandidateIndex(x, y);
+        highlightIndex = downIndex;
         setPressed(true);
-        highlightIndex = getCandidateIndex(x, y);
+        if (parent != null) parent.requestDisallowInterceptTouchEvent(true);
         invalidate();
         break;
-        // updateHighlight(x, y);
+      case MotionEvent.ACTION_MOVE:
+        // 明顯橫滑才放行外層攔截（滑動翻頁、展開候選、捲動長候選列）
+        if (parent != null && Math.abs(me.getX() - downX) > swipeSlop) {
+          parent.requestDisallowInterceptTouchEvent(false);
+        }
+        final int moveIndex = getCandidateIndex(x, y);
+        if (moveIndex >= 0) highlightIndex = moveIndex; // 滑過候選間隙不清掉高亮
+        invalidate();
+        break;
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
         timeMove = System.currentTimeMillis();
         long durationMs = timeMove - timeDown;
         setPressed(false);
         if (me.getActionMasked() == MotionEvent.ACTION_UP) {
-          onCandidateClick(highlightIndex, durationMs >= Config.getDeleteCandidateTimeout());
+          // 手指拖出候選列外放開＝刻意取消，不選；
+          // 放開點落在候選間隙（仍在候選列內）：用按下時的候選
+          final boolean inside = y >= 0 && y < getHeight();
+          int index = inside ? getCandidateIndex(x, y) : -1;
+          if (index < 0 && inside) index = downIndex;
+          onCandidateClick(index, durationMs >= Config.getDeleteCandidateTimeout());
         }
+        downIndex = -1;
         highlightIndex = -1;
         invalidate();
         break;
@@ -413,14 +439,12 @@ public class Candidate extends View {
   private int getCandidateIndex(int x, int y) {
     // Rect r = new Rect();
     int retIndex = -1;
-    for (ComputedCandidate computedCandidate : computedCandidates) {
-      /*
-       Enlarge the rectangle to be more responsive to user clicks.
-      r.set(candidateRect[j++]);
-      r.inset(0, CANDIDATE_TOUCH_OFFSET);
-      */
-      if (computedCandidate.getGeometry().contains(x, y)) {
-        retIndex = computedCandidates.indexOf(computedCandidate);
+    // 候選列只有一行：只比橫座標。Rect 高度取自排版當下的 getMeasuredHeight()，
+    // 高度尚未量好／過期時用 contains(x, y) 會整排點不到；垂直方向的取消判定在 ACTION_UP
+    for (int i = 0; i < computedCandidates.size(); i++) {
+      final Rect r = computedCandidates.get(i).getGeometry();
+      if (x >= r.left && x < r.right) {
+        retIndex = i;
         break;
       }
     }

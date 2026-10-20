@@ -531,15 +531,7 @@ public class Composition extends AppCompatTextView {
    */
   public int setWindow(int stringMinLength, int candidateMinCheck) {
     if (getVisibility() != View.VISIBLE) return 0;
-    StackTraceElement[] stacks = new Throwable().getStackTrace();
-    Timber.d(
-        "setWindow Rime.getComposition()"
-            + ", [1]"
-            + stacks[1].toString()
-            + ", [2]"
-            + stacks[2].toString()
-            + ", [3]"
-            + stacks[3].toString());
+    // 不在這裡抓 stack trace 印 log：每次按鍵都會跑，new Throwable() 很貴
     Rime.RimeComposition r = Rime.getComposition();
     if (r == null) return 0;
     String s = r.getText();

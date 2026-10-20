@@ -2,6 +2,7 @@ package com.osfans.trime
 
 import android.app.Application
 import android.os.Process
+import android.util.Log
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import com.osfans.trime.data.AppPrefs
 import com.osfans.trime.settings.LogActivity
@@ -33,9 +34,10 @@ class TrimeApplication : Application() {
             .apply()
         instance = this
         try {
-            if (BuildConfig.DEBUG) {
-                Timber.plant(Timber.DebugTree())
-            }
+            // 非 debuggable 版只記 WARN 以上：DebugTree 每筆 log 都 new Throwable() 抓 stack
+            // 當 tag，按鍵／繪製／候選路徑每次觸發幾十筆，是打字卡頓的主因之一。
+            // 保留 WARN/ERROR 讓設定頁「即時日誌」還看得到問題
+            Timber.plant(if (BuildConfig.DEBUG) Timber.DebugTree() else WarnTree)
             val prefs = AppPrefs.initDefault(this)
             prefs.initDefaultPreferences()
             // 遷移 legacy /sdcard/rime：該目錄跨安裝會孤兒化（MediaProvider owner 消失、
@@ -57,6 +59,15 @@ class TrimeApplication : Application() {
         } catch (e: Exception) {
             e.fillInStackTrace()
             return
+        }
+    }
+
+    /** 固定 tag、只收 WARN 以上；isLoggable 為 false 時 Timber 不會格式化訊息 */
+    private object WarnTree : Timber.Tree() {
+        override fun isLoggable(tag: String?, priority: Int) = priority >= Log.WARN
+
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+            Log.println(priority, tag ?: "Trime", message)
         }
     }
 }

@@ -9,8 +9,8 @@ android {
         applicationId "com.tumuyan.trime"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 20260740
-        versionName "3.2.7-dafa.52"
+        versionCode 20260741
+        versionName "3.2.7-dafa.53"
         setProperty("archivesBaseName", "dafa-$versionName")
         resValue "string", "trime_url", getGitUrl()
         buildConfigField 'String', 'BUILD_INFO' , '"' + getBuildInfo() + '"'
@@ -27,6 +27,12 @@ android {
     }
 
     buildTypes {
+        // CI 發佈的是 assembleDebug（沿用 debug 簽章，手機可直接覆蓋升級），但不能是
+        // debuggable：ART 對 debuggable app 停用大部分 JIT/AOT 最佳化，且 BuildConfig.DEBUG
+        // 會種下 Timber.DebugTree（每筆 log 抓 stack trace）→ 打字、選字明顯卡頓
+        debug {
+            debuggable false
+        }
         release {
             minifyEnabled false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-android.txt'
